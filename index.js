@@ -23,3 +23,6 @@ mongoose.connect(dbURL)
     })
 
 app.use(morgan("dev"))
+
+const authRoutes = require("./routes/authRoutes")
+app.use('/auth', authRoutes)
