@@ -1,4 +1,6 @@
 const { verify } = require("jsonwebtoken");
+const dotenv = require("dotenv");
+dotenv.config();
 
 const validateToken = role => {
     return (req, res, next) => {
@@ -8,9 +10,9 @@ const validateToken = role => {
         }
 
         try {
-            const validToken = verify(accessToken, "theJWTsecret");
+            const validToken = verify(accessToken, process.env.JWT_SECRET);
             req.user = validToken;
-            console.log("validToken: ", validToken.role);
+            console.log("validToken: ", validToken);
 
             if (role && role.length > 0 && !role.includes(validToken.role)) {
                 return res.json({ error: "Access denied" });
