@@ -5,6 +5,8 @@ const { sign } = require("jsonwebtoken");
 const User = require('../models/User');
 
 const dotenv = require("dotenv");
+const { validateToken } = require("../middlewares/AuthMiddlewares");
+const Employer = require("../models/Employer");
 dotenv.config();
 
 
@@ -70,6 +72,45 @@ router.post('/login', async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 });
+
+router.post('/employer', validateToken([]), (req, res) => {
+    const userRole = req.user.role
+    const userId = req.user.id
+    const { companyName, companyDescription, specialties, contactInfo, address } = req.body
+
+
+    if (userRole) {
+        res.json({ error: "you have already chosen the role" })
+    }
+
+    const employer = new Employer({
+        userId,
+        companyName,
+        companyDescription,
+        specialties,
+        contactInfo: {
+            phone: contactInfo.phone,
+            email: contactInfo.email,
+        },
+        address,
+    })
+
+    employer.save()
+        .then(result => {
+            User.findOneAndUpdate({ _id: userId }, { role: "employer" })
+                .then(result1 => {
+                    res.json("success")
+                }).catch(err => {
+                    res.status(500).json({ error: err.message })
+                })
+        })
+        .catch(err => {
+            res.status(500).json({ error: err.message })
+        })
+
+
+
+})
 
 
 

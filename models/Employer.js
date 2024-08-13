@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 const employerSchema = new mongoose.Schema({
+    userId: {
+        type: String,
+        required: true
+    },
     companyName: {
         type: String,
         required: true
@@ -24,11 +28,9 @@ const employerSchema = new mongoose.Schema({
         }
     },
     address: {
-        street: String,
-        city: String,
-        state: String,
-        zip: String
-    }
+        type: String,
+        required: false
+    },
 });
 
 const Employer = mongoose.model('Employer', employerSchema);

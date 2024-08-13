@@ -15,14 +15,6 @@ const userSchema = new mongoose.Schema({
         enum: ['employer', 'employee'],
         default: null
     },
-    employerId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Employer'
-    },
-    employeeId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Employee'
-    }
 });
 
 const User = mongoose.model('User', userSchema);
