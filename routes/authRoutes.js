@@ -7,6 +7,7 @@ const User = require('../models/User');
 const dotenv = require("dotenv");
 const { validateToken } = require("../middlewares/AuthMiddlewares");
 const Employer = require("../models/Employer");
+const Employee = require("../models/Employee");
 dotenv.config();
 
 
@@ -112,7 +113,38 @@ router.post('/employer', validateToken([]), (req, res) => {
 
 })
 
+router.post('/employee', validateToken([]), (req, res) => {
+    const userRole = req.user.role
+    const userId = req.user.id
+    const { fullName, phoneNumber, professionalSummary, skills, experience, education } = req.body
 
+    if (userRole) {
+        res.json({ error: "you have already chosen the role" })
+    }
+
+    const employee = new Employee({
+        userId,
+        fullName,
+        phoneNumber,
+        professionalSummary,
+        skills,
+        experience,
+        education,
+    })
+    employee.save()
+        .then(result => {
+            User.findOneAndUpdate({ _id: userId }, { role: "employee" })
+                .then(result1 => {
+                    res.json("success")
+                }).catch(err => {
+                    res.status(500).json({ error: err.message })
+                })
+        })
+        .catch(err => {
+            res.status(500).json({ error: err.message })
+        })
+
+})
 
 
 module.exports = router

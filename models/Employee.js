@@ -9,15 +9,13 @@ const jobExperienceSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    duration: {
-        start: {
-            type: Date,
-            required: true
-        },
-        end: {
-            type: Date,
-            required: true
-        }
+    startDate: {
+        type: Date,
+        required: true
+    },
+    endDate: {
+        type: Date,
+        required: true
     },
     description: {
         type: String,
@@ -34,13 +32,17 @@ const educationSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    yearOfGraduation: {
-        type: Number,
+    graduationYear: {
+        type: String,
         required: true
     }
 });
 
 const employeeSchema = new mongoose.Schema({
+    userId: {
+        type: String,
+        required: true
+    },
     fullName: {
         type: String,
         required: true
