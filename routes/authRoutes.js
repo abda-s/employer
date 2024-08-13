@@ -146,5 +146,16 @@ router.post('/employee', validateToken([]), (req, res) => {
 
 })
 
+router.get('/employee', validateToken(['employee']), (req, res) => {
+    const { id } = req.user
+    Employee.findOne({ userId: id })
+        .then(result => {
+            res.status(200).json(result)
+        })
+        .catch(err => {
+            res.status(500).json({ error: err.message })
+        })
+})
+
 
 module.exports = router
