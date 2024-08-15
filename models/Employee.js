@@ -55,10 +55,20 @@ const employeeSchema = new mongoose.Schema({
         type: String,
         required: false
     },
-    skills: {
-        type: [String],
-        required: true
-    },
+    skills: [
+        {
+            name: {
+                type: String,
+                required: true
+            },
+            level: {
+                type: String,
+                default:"0"
+            },
+        }
+    ]
+
+    ,
     experience: [jobExperienceSchema],
     education: [educationSchema]
 });

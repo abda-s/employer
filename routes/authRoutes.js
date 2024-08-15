@@ -74,77 +74,105 @@ router.post('/login', async (req, res) => {
     }
 });
 
-router.post('/employer', validateToken([]), (req, res) => {
-    const userRole = req.user.role
-    const userId = req.user.id
-    const { companyName, companyDescription, specialties, contactInfo, address } = req.body
+router.post('/employer', validateToken([]), async (req, res) => {
+    const { role, id: userId } = req.user;
+    const { companyName, companyDescription, specialties, contactInfo, address } = req.body;
 
-
-    if (userRole) {
-        res.json({ error: "you have already chosen the role" })
+    // Check if the user has already chosen a role
+    if (role) {
+        return res.json({ error: "You have already chosen a role" });
     }
 
-    const employer = new Employer({
-        userId,
-        companyName,
-        companyDescription,
-        specialties,
-        contactInfo: {
-            phone: contactInfo.phone,
-            email: contactInfo.email,
-        },
-        address,
-    })
+    try {
+        // Create a new Employer document
+        const employer = new Employer({
+            userId,
+            companyName,
+            companyDescription,
+            specialties,
+            contactInfo: {
+                phone: contactInfo.phone,
+                email: contactInfo.email,
+            },
+            address,
+        });
 
-    employer.save()
-        .then(result => {
-            User.findOneAndUpdate({ _id: userId }, { role: "employer" })
-                .then(result1 => {
-                    res.json("success")
-                }).catch(err => {
-                    res.status(500).json({ error: err.message })
-                })
-        })
-        .catch(err => {
-            res.status(500).json({ error: err.message })
-        })
+        // Save the employer document
+        await employer.save();
+
+        // Update the user's role
+        await User.findOneAndUpdate({ _id: userId }, { role: "employer" });
+
+        // Find the updated user
+        const user = await User.findOne({ _id: userId });
+        if (!user) {
+            return res.json({ error: "User not found" });
+        }
+
+        // Generate a new access token
+        const accessToken = sign(
+            { email: user.email, id: user.id, role: user.role },
+            process.env.JWT_SECRET
+        );
+
+        // Send the token as a response
+        res.json({ token: accessToken });
+
+    } catch (err) {
+        // Handle errors
+        res.status(500).json({ error: err.message });
+    }
+});
 
 
+router.post('/employee', validateToken([]), async (req, res) => {
+    const { role, id: userId } = req.user;
+    const { fullName, phoneNumber, professionalSummary, skills, experience, education } = req.body;
 
-})
-
-router.post('/employee', validateToken([]), (req, res) => {
-    const userRole = req.user.role
-    const userId = req.user.id
-    const { fullName, phoneNumber, professionalSummary, skills, experience, education } = req.body
-
-    if (userRole) {
-        res.json({ error: "you have already chosen the role" })
+    // Check if the user has already chosen a role
+    if (role) {
+        return res.json({ error: "You have already chosen a role" });
     }
 
-    const employee = new Employee({
-        userId,
-        fullName,
-        phoneNumber,
-        professionalSummary,
-        skills,
-        experience,
-        education,
-    })
-    employee.save()
-        .then(result => {
-            User.findOneAndUpdate({ _id: userId }, { role: "employee" })
-                .then(result1 => {
-                    res.json("success")
-                }).catch(err => {
-                    res.status(500).json({ error: err.message })
-                })
-        })
-        .catch(err => {
-            res.status(500).json({ error: err.message })
-        })
+    try {
+        // Create a new Employee document
+        const employee = new Employee({
+            userId,
+            fullName,
+            phoneNumber,
+            professionalSummary,
+            skills,
+            experience,
+            education,
+        });
 
-})
+        // Save the employee document
+        await employee.save();
+
+        // Update the user's role
+        await User.findOneAndUpdate({ _id: userId }, { role: "employee" });
+
+        // Find the updated user
+        const user = await User.findOne({ _id: userId });
+        if (!user) {
+            return res.json({ error: "User not found" });
+        }
+
+        // Generate a new access token
+        const accessToken = sign(
+            { email: user.email, id: user.id, role: user.role },
+            process.env.JWT_SECRET
+        );
+
+        // Send the token as a response
+        res.json({ token: accessToken });
+
+    } catch (err) {
+        // Handle errors
+        res.status(500).json({ error: err.message });
+    }
+});
+
 
 router.post('/employee-data', validateToken(['employee']), (req, res) => {
     const { id } = req.user
@@ -347,5 +375,91 @@ router.delete('/experience/:id', validateToken(["employee"]), async (req, res) =
 
 })
 
+
+router.put('/edit-skill', validateToken(["employee"]), async (req, res) => {
+    const id = req.user.id;
+    const { skillsIndex, name, level } = req.body;
+
+    try {
+        const employee = await Employee.findOne({ userId: id });
+        if (!employee) {
+            return res.status(404).json({ error: "Employee not found" });
+        }
+
+        // Check if the educationIndex is valid
+        if (skillsIndex < 0 || skillsIndex >= employee.skills.length) {
+            return res.status(400).json({ error: "Invalid skills index" });
+        }
+
+        // Update the specific fields in the education array
+        employee.skills[skillsIndex].name = name;
+        employee.skills[skillsIndex].level = level;
+
+        // Save the updated document
+        await employee.save();
+
+        res.json("success");
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
+router.put("/add-skill", validateToken(["employee"]), async (req, res) => {
+    const id = req.user.id;
+    const { name, level } = req.body;
+
+    try {
+        // Find the employee by userId
+        const employee = await Employee.findOne({ userId: id });
+
+        if (!employee) {
+            return res.status(404).json({ error: "Employee not found" });
+        }
+
+        // Add the new education entry to the education array
+        employee.skills.push({
+            name, level
+        });
+
+        // Save the updated employee document
+        await employee.save();
+
+        res.json("success");
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+        console.log(err);
+    }
+});
+
+router.delete('/skill/:id', validateToken(["employee"]), async (req, res) => {
+    const userId = req.user.id
+    const skillsIndex = req.params.id
+
+    const employee = await Employee.findOne({ userId });
+    try {
+
+        if (!employee) {
+            return res.status(404).json({ error: "Employee not found" });
+        }
+
+        // Validate the index
+        if (skillsIndex < 0 || skillsIndex >= employee.skills.length) {
+            return res.status(400).json({ error: "Invalid skill index" });
+        }
+
+        // Remove the education entry at the specified index
+        employee.skills.splice(skillsIndex, 1);
+
+        await employee.save();
+        res.json("success");
+
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+        console.log(err);
+    }
+
+})
 
 module.exports = router
