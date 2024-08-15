@@ -258,6 +258,94 @@ router.delete('/education/:id', validateToken(["employee"]), async (req, res) =>
 
 })
 
+router.put('/edit-experience', validateToken(["employee"]), async (req, res) => {
+    const id = req.user.id;
+    const { experienceIndex, jobTitle, companyName, description, startDate, endDate } = req.body;
+
+    try {
+        const employee = await Employee.findOne({ userId: id });
+        if (!employee) {
+            return res.status(404).json({ error: "Employee not found" });
+        }
+
+        // Check if the educationIndex is valid
+        if (experienceIndex < 0 || experienceIndex >= employee.experience.length) {
+            return res.status(400).json({ error: "Invalid experience index" });
+        }
+
+        // Update the specific fields in the education array
+        employee.experience[experienceIndex].jobTitle = jobTitle;
+        employee.experience[experienceIndex].companyName = companyName;
+        employee.experience[experienceIndex].description = description;
+        employee.experience[experienceIndex].startDate = startDate;
+        employee.experience[experienceIndex].endDate = endDate;
+
+        // Save the updated document
+        await employee.save();
+
+        res.json("success");
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
+router.put("/add-experience", validateToken(["employee"]), async (req, res) => {
+    const id = req.user.id;
+    const { jobTitle, companyName, description, startDate, endDate } = req.body;
+
+    try {
+        // Find the employee by userId
+        const employee = await Employee.findOne({ userId: id });
+
+        if (!employee) {
+            return res.status(404).json({ error: "Employee not found" });
+        }
+
+        // Add the new education entry to the education array
+        employee.experience.push({
+            jobTitle, companyName, description, startDate, endDate
+        });
+
+        // Save the updated employee document
+        await employee.save();
+
+        res.json("success");
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+        console.log(err);
+    }
+});
+
+router.delete('/experience/:id', validateToken(["employee"]), async (req, res) => {
+    const userId = req.user.id
+    const experienceIndex = req.params.id
+
+    const employee = await Employee.findOne({ userId });
+    try {
+
+        if (!employee) {
+            return res.status(404).json({ error: "Employee not found" });
+        }
+
+        // Validate the index
+        if (experienceIndex < 0 || experienceIndex >= employee.experience.length) {
+            return res.status(400).json({ error: "Invalid education index" });
+        }
+
+        // Remove the education entry at the specified index
+        employee.experience.splice(experienceIndex, 1);
+
+        await employee.save();
+        res.json("success");
+
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+        console.log(err);
+    }
+
+})
 
 
 module.exports = router
