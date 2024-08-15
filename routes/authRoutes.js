@@ -146,7 +146,7 @@ router.post('/employee', validateToken([]), (req, res) => {
 
 })
 
-router.get('/employee', validateToken(['employee']), (req, res) => {
+router.post('/employee-data', validateToken(['employee']), (req, res) => {
     const { id } = req.user
     Employee.findOne({ userId: id })
         .then(result => {
@@ -156,6 +156,108 @@ router.get('/employee', validateToken(['employee']), (req, res) => {
             res.status(500).json({ error: err.message })
         })
 })
+
+
+router.put('/edit-personal-data', validateToken(["employee"]), (req, res) => {
+    const id = req.user.id
+    const { fullName, phoneNumber, professionalSummary } = req.body
+    Employee.findOneAndUpdate({ userId: id }, { fullName, phoneNumber, professionalSummary })
+        .then(() => {
+            res.json("success")
+        })
+        .catch(err => {
+            res.status(500).json({ error: err.message })
+        })
+})
+
+router.put('/edit-education', validateToken(["employee"]), async (req, res) => {
+    const id = req.user.id;
+    const { educationIndex, institutionName, degree, graduationYear } = req.body;
+
+    try {
+        const employee = await Employee.findOne({ userId: id });
+        if (!employee) {
+            return res.status(404).json({ error: "Employee not found" });
+        }
+
+        // Check if the educationIndex is valid
+        if (educationIndex < 0 || educationIndex >= employee.education.length) {
+            return res.status(400).json({ error: "Invalid education index" });
+        }
+
+        // Update the specific fields in the education array
+        employee.education[educationIndex].institutionName = institutionName;
+        employee.education[educationIndex].degree = degree;
+        employee.education[educationIndex].graduationYear = graduationYear;
+
+        // Save the updated document
+        await employee.save();
+
+        res.json("success");
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+router.put("/add-education", validateToken(["employee"]), async (req, res) => {
+    const id = req.user.id;
+    const { institutionName, degree, graduationYear } = req.body;
+
+    try {
+        // Find the employee by userId
+        const employee = await Employee.findOne({ userId: id });
+
+        if (!employee) {
+            return res.status(404).json({ error: "Employee not found" });
+        }
+
+        // Add the new education entry to the education array
+        employee.education.push({
+            institutionName,
+            degree,
+            graduationYear
+        });
+
+        // Save the updated employee document
+        await employee.save();
+
+        res.json("success");
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+        console.log(err);
+    }
+});
+
+router.delete('/education/:id', validateToken(["employee"]), async (req, res) => {
+    const userId = req.user.id
+    const educationIndex = req.params.id
+
+    const employee = await Employee.findOne({ userId });
+    try {
+
+        if (!employee) {
+            return res.status(404).json({ error: "Employee not found" });
+        }
+
+        // Validate the index
+        if (educationIndex < 0 || educationIndex >= employee.education.length) {
+            return res.status(400).json({ error: "Invalid education index" });
+        }
+
+        // Remove the education entry at the specified index
+        employee.education.splice(educationIndex, 1);
+
+        await employee.save();
+        res.json("success");
+
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+        console.log(err);
+    }
+
+})
+
 
 
 module.exports = router
