@@ -29,10 +29,6 @@ const applicationSchema = new mongoose.Schema({
         type: String,
         required: false
     },
-    resumePath: {
-        type: String,
-        required: false
-    },
     comments: {
         type: String,
         required: false

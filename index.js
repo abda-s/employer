@@ -25,8 +25,13 @@ mongoose.connect(dbURL)
 
 app.use(morgan("dev"))
 
+
 const authRoutes = require("./routes/authRoutes")
 app.use('/auth', authRoutes)
 
 const jobPostingRoutes = require("./routes/jobPostingRoutes")
 app.use('/job-posting', jobPostingRoutes)
+
+
+const applicationRoutes = require('./routes/applicationRoutes')
+app.use('/application', applicationRoutes)

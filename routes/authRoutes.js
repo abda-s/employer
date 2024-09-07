@@ -174,15 +174,20 @@ router.post('/employee', validateToken([]), async (req, res) => {
 });
 
 
-router.post('/employee-data', validateToken(['employee']), (req, res) => {
+router.post('/employee-data', validateToken(['employee']), async (req, res) => {
     const { id } = req.user
-    Employee.findOne({ userId: id })
-        .then(result => {
-            res.status(200).json(result)
-        })
-        .catch(err => {
-            res.status(500).json({ error: err.message })
-        })
+    try {
+        const employee = await Employee.findOne({ userId: id }).populate({ path: "userId", select: 'email' })
+
+        if (!employee) {
+            res.status(500).json({ error: "employee not found" })
+        }
+
+        res.status(200).json(employee)
+    } catch (err) {
+        res.status(500).json({ error: err.message })
+    }
+
 })
 
 

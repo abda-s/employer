@@ -2,6 +2,8 @@ const express = require("express");
 const { validateToken } = require("../middlewares/AuthMiddlewares");
 const JobPosting = require("../models/JobPosting");
 const Employer = require('../models/Employer')
+const Employee = require('../models/Employee')
+const Application = require("../models/Application")
 const router = express.Router();
 
 
@@ -27,16 +29,27 @@ router.get('/', validateToken(["employer"]), async (req, res) => {
 
 router.get('/employee', validateToken(["employee"]), async (req, res) => {
     try {
-        // const userId = req.user.id;
+        const userId = req.user.id;
 
-        const jobPostings = await JobPosting.find();
+        // Find the employee by userId
+        const employee = await Employee.findOne({ userId });
+        if (!employee) {
+            return res.status(404).json({ error: 'Employee not found' });
+        }
+        const employeeId = employee._id;
+
+        // Find all applications submitted by the employee
+        const appliedJobIds = await Application.find({ employeeId }).distinct('jobPostingId');
+
+        // Find all job postings excluding the ones the employee has applied for
+        const jobPostings = await JobPosting.find({ _id: { $nin: appliedJobIds } });
 
         res.status(200).json(jobPostings);
-
     } catch (error) {
-        res.status(500).json({ error: `Failed to get job postings: ${error}` });
+        res.status(500).json({ error: `Failed to get job postings: ${error.message}` });
     }
-})
+});
+
 
 router.post('/add-job', validateToken(["employer"]), async (req, res) => {
     try {
