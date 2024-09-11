@@ -15,6 +15,8 @@ const validateToken = role => {
             // console.log("validToken: ", validToken);
 
             if (role && role.length > 0 && !role.includes(validToken.role)) {
+                console.log(role);
+                console.log(validToken.role);
                 return res.json({ error: "Access denied" });
             }
 

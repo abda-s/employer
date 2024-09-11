@@ -6,6 +6,36 @@ const Application = require("../models/Application");
 const Employer = require("../models/Employer");
 const router = express.Router();
 
+
+
+
+
+router.get("/employee", validateToken(["employee"]), async (req, res) => {
+    const userId = req.user.id;    
+    try {
+        const employee = await Employee.findOne({userId})
+
+        if (!employee) {
+            return res.status(404).json({ error: 'Employee not found' });
+        }
+
+        const employeeId = employee._id
+
+        const applications = await Application.find({ employeeId })
+        .select("jobPostingId applicationDate coverLetter") // Select fields from the Application model
+        .populate({
+            path: "jobPostingId", // Populate the jobPostingId field
+            select: "jobTitle companyName location description requirements status" // Select specific fields from the JobPosting model
+        });
+    
+        res.status(200).json(applications)
+
+
+    } catch (error) {
+        res.status(500).json({ error: `Failed to get job posting with applications: ${error.message}` });
+    }
+})
+
 router.post('/', validateToken(["employee"]), async (req, res) => {
     const { jobPostingId, coverLetter } = req.body;
     const userId = req.user.id;
@@ -39,6 +69,8 @@ router.post('/', validateToken(["employee"]), async (req, res) => {
 });
 
 router.get('/', validateToken(["employer"]), async (req, res) => {
+
+    
     const userId = req.user.id;
 
     try {
@@ -60,7 +92,7 @@ router.get('/', validateToken(["employer"]), async (req, res) => {
     }
 });
 
-router.get('/:id', validateToken(["employer"]), async (req, res) => {
+router.get('/get-application/:id', validateToken(["employer"]), async (req, res) => {
     const userId = req.user.id;
     const jobPostingId = req.params.id;
 
@@ -83,14 +115,14 @@ router.get('/:id', validateToken(["employer"]), async (req, res) => {
 
         // Find applications for the job posting and populate the employee details
         const applications = await Application.find({ jobPostingId })
-        .populate({
-          path: 'employeeId',
-          populate: {
-            path: 'userId', // This populates the userId within the employeeId
-            select: 'email' // Select only the email field from the userId document
-          }
-        })
-        .populate('jobPostingId');
+            .populate({
+                path: 'employeeId',
+                populate: {
+                    path: 'userId', // This populates the userId within the employeeId
+                    select: 'email' // Select only the email field from the userId document
+                }
+            })
+            .populate('jobPostingId');
         // Add applications array to the jobPosting object
         const jobPostingWithApplications = {
             ...jobPosting.toObject(), // Convert Mongoose document to plain JavaScript object
@@ -138,7 +170,5 @@ router.put('/', validateToken(["employer"]), async (req, res) => {
     }
 
 })
-
-
 
 module.exports = router
