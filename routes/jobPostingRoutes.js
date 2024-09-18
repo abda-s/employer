@@ -5,7 +5,6 @@ const Employer = require('../models/Employer')
 const Employee = require('../models/Employee')
 const Application = require("../models/Application");
 const Skill = require("../models/Skill");
-const Category = require("../models/Category");
 const router = express.Router();
 
 // jobs that the employer posted
