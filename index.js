@@ -30,7 +30,7 @@ const authRoutes = require("./routes/authRoutes")
 app.use('/auth', authRoutes)
 
 const cvRoutes = require('./routes/cvRoutes')
-app.use('/cv',cvRoutes)
+app.use('/cv', cvRoutes)
 
 const jobPostingRoutes = require("./routes/jobPostingRoutes")
 app.use('/job-posting', jobPostingRoutes)
@@ -41,3 +41,6 @@ app.use('/application', applicationRoutes)
 
 const usersRoutes = require('./routes/usersRoutes')
 app.use('/users', usersRoutes)
+
+const skillsRoutes = require('./routes/skillsRoutes')
+app.use('/skills', skillsRoutes)
