@@ -73,6 +73,7 @@ router.post('/login', async (req, res) => {
     }
 });
 
+// for the new set to chose the role of employer
 router.post('/employer', validateToken([]), async (req, res) => {
     const { role, id: userId } = req.user;
     const { companyName, companyDescription, specialties, contactInfo, address } = req.body;
@@ -123,6 +124,7 @@ router.post('/employer', validateToken([]), async (req, res) => {
     }
 });
 
+// for the new set to chose the role of employee
 router.post('/employee', validateToken([]), async (req, res) => {
     const { role, id: userId } = req.user;
     const { fullName, phoneNumber, professionalSummary, skills, experience, education } = req.body;
@@ -175,7 +177,7 @@ router.post('/employee', validateToken([]), async (req, res) => {
     }
 });
 
-
+// for the employee user to get there data (cv)
 router.get('/employee-data', validateToken(['employee']), async (req, res) => {
     const { id } = req.user
     try {
