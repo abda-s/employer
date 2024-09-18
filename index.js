@@ -35,3 +35,6 @@ app.use('/job-posting', jobPostingRoutes)
 
 const applicationRoutes = require('./routes/applicationRoutes')
 app.use('/application', applicationRoutes)
+
+const usersRoutes = require('./routes/usersRoutes')
+app.use('/users', usersRoutes)

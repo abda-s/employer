@@ -3,11 +3,13 @@ const { validateToken } = require("../middlewares/AuthMiddlewares");
 const JobPosting = require("../models/JobPosting");
 const Employer = require('../models/Employer')
 const Employee = require('../models/Employee')
-const Application = require("../models/Application")
+const Application = require("../models/Application");
+const Skill = require("../models/Skill");
+const Category = require("../models/Category");
 const router = express.Router();
 
 
-router.get('/', validateToken(["employer"]), async (req, res) => {
+router.get('/posted-jobs', validateToken(["employer"]), async (req, res) => {
     try {
         const userId = req.user.id;
 
@@ -18,7 +20,7 @@ router.get('/', validateToken(["employer"]), async (req, res) => {
         }
         const employerId = employer._id;
 
-        const jobPostings = await JobPosting.find({ employerId });
+        const jobPostings = await JobPosting.find({ employerId }).populate({ path: "skills", select: "name" });
 
         res.status(200).json(jobPostings);
 
@@ -27,57 +29,156 @@ router.get('/', validateToken(["employer"]), async (req, res) => {
     }
 })
 
-router.get('/employee', validateToken(["employee"]), async (req, res) => {
+router.get('/all-jobs', validateToken(["admin"]), async (req, res) => {
+    try {
+        const jobPostings = await JobPosting.find()
+            .populate({
+                path: 'skills',
+                select: 'name' // Select only the 'name' field from the Skill model
+            })
+            .exec();
+
+        // Convert Mongoose documents to plain objects and format jobs
+        const formattedJobs = jobPostings.map(job => {
+            // Convert the job document to a plain object
+            const jobObj = job.toObject();
+
+            // Map skill documents to their names
+            const fromSkills = jobObj.skills.map(skill => skill.name);
+
+            return {
+                ...jobObj,
+                skills: fromSkills
+            };
+        });
+
+
+        // Send the response
+        res.status(200).json(formattedJobs);
+
+    } catch (error) {
+        res.status(500).json({ error: `Failed to get job postings: ${error}` });
+    }
+})
+
+router.get('/job-listing', validateToken(["employee"]), async (req, res) => {
     try {
         const userId = req.user.id;
 
-        // Find the employee by userId
-        const employee = await Employee.findOne({ userId });
+        // Find the employee by userId and populate employeeSkills with skillId and categoryId
+        const employee = await Employee.findOne({ userId }).populate({
+            path: "employeeSkills.skillId",
+            select: "name categoryId",
+            populate: { path: "categoryId", select: "name" }
+        });
+
         if (!employee) {
             return res.status(404).json({ error: 'Employee not found' });
         }
-        const employeeId = employee._id;
+
+        const employeeSkills = [...new Set(employee.employeeSkills.map(es => es.skillId._id.toString()))];
+        const employeeCategories = [...new Set(employee.employeeSkills.map(es => es.skillId.categoryId._id.toString()))];
+
+
 
         // Find all applications submitted by the employee
-        const appliedJobIds = await Application.find({ employeeId }).distinct('jobPostingId');
+        const appliedJobIds = await Application.find({ employeeId: employee._id }).distinct('jobPostingId');
 
-        // Find all job postings excluding the ones the employee has applied for
-        const jobPostings = await JobPosting.find({ _id: { $nin: appliedJobIds } });
+        // Find all job postings excluding the ones the employee has applied for, and populate their skills and categories
+        const jobPostings = await JobPosting.find({ _id: { $nin: appliedJobIds } }).populate({
+            path: "skills",
+            select: "name categoryId",
+            populate: { path: "categoryId", select: "name" }
+        });
 
-        res.status(200).json(jobPostings);
+        // Initialize an array to store job postings results
+        const jobResults = [];
+
+        jobPostings.forEach(job => {
+            const jobSkills = job.skills.map(skill => skill._id.toString());
+
+            const jobCategories = job.skills.map(skill => skill.categoryId._id.toString());
+
+            // Check if the employee has any skills that match the job posting's skills
+            const hasMatchingSkills = employeeSkills.some(skillId => jobSkills.includes(skillId));
+
+            if (hasMatchingSkills) {
+                jobResults.push(job);
+            } else {
+                // If no matching skills, check if job's categories match any of the employee's skill categories
+                const hasSameCategories = employeeCategories.some(categoryId => jobCategories.includes(categoryId));
+                console.log("hasSameCategories: ", hasSameCategories);
+
+                if (hasSameCategories) {
+                    jobResults.push(job);
+                }
+            }
+        });
+
+        // Return the job postings with the matching skills and/or categories
+        res.status(200).json(jobResults);
     } catch (error) {
-        res.status(500).json({ error: `Failed to get job postings: ${error.message}` });
+        res.status(500).json({ error: `Failed to get job listings: ${error.message}` });
     }
 });
 
 
+
 router.post('/add-job', validateToken(["employer"]), async (req, res) => {
+    const { jobTitle, companyName, location, description, applicationDeadline, skills } = req.body;
+    const userId = req.user.id;
+
     try {
-        const { jobTitle, companyName, location, description, requirements, applicationDeadline } = req.body;
-        const userId = req.user.id;
 
         const employer = await Employer.findOne({ userId });
 
         if (!employer) {
             return res.status(404).json({ error: 'Employer not found' });
         }
-
         const employerId = employer._id;
 
+
+
+        let skillIds = [];  // Array to store the skill IDs
+        let requirementNames = []
+
+        for (const skill of skills) {
+            // Check if the skill already exists
+
+
+
+            const dbSkill = await Skill.findById(skill._id);
+
+            if (!dbSkill) {
+                // Create the skill with the category reference
+                const newSkill = new Skill({
+                    name: skill.name,
+                    categoryId: null
+                });
+
+                // Save the new skill
+                const savedSkill = await newSkill.save();
+                skillIds.push(savedSkill._id);  // Add the newly created skill's ID to the array
+                requirementNames.push(savedSkill.name)
+            } else {
+                // If the skill already exists, push its ID to the array
+                skillIds.push(dbSkill._id);
+                requirementNames.push(dbSkill.name)
+            }
+        }
 
         const jobPosting = new JobPosting({
             jobTitle,
             companyName,
             location,
             description,
-            requirements,
             applicationDeadline,
-            employerId
+            employerId,
+            skills: skillIds
         });
 
         await jobPosting.save();
 
-        console.log(jobPosting)
 
         res.status(201).json({ message: 'Job posting created successfully', jobPosting });
     } catch (error) {
@@ -85,44 +186,226 @@ router.post('/add-job', validateToken(["employer"]), async (req, res) => {
     }
 });
 
-
-router.put("/edit-job", validateToken(['employer']), async (req, res) => {
-    const { jobTitle, companyName, location, description, requirements, applicationDeadline, status, postId } = req.body;
-    const userId = req.user.id
+router.put("/edit-job", validateToken(['employer', "admin"]), async (req, res) => {
+    const { jobTitle, companyName, location, description, applicationDeadline, status, postId, skills } = req.body;
     try {
-        const employer = await Employer.findOne({ userId });
-
-        if (!employer) {
-            return res.status(404).json({ error: 'Employer not found' });
-        }
-
-        const employerId = employer._id;
         const jobPosting = await JobPosting.findById(postId);
 
+        let skillIds = []
 
-        if (!employerId.equals(jobPosting.employerId)) {
-            return res.status(403).json({ error: 'You do not have permission to edit this job posting' });
+        for (const skill of skills) {
+            // Check if the skill already exists
+
+
+            const dbSkill = await Skill.findById(skill._id);
+
+            if (!dbSkill) {
+                // Create the skill with the category reference
+                const newSkill = new Skill({
+                    name: skill.name,
+                    categoryId: null
+                });
+
+                // Save the new skill
+                const savedSkill = await newSkill.save();
+                skillIds.push(savedSkill._id);  // Add the newly created skill's ID to the array
+            } else {
+                // If the skill already exists, push its ID to the array
+                skillIds.push(dbSkill._id);
+            }
         }
-
 
         jobPosting.jobTitle = jobTitle
         jobPosting.companyName = companyName
         jobPosting.description = description
-        jobPosting.requirements = requirements
         jobPosting.location = location
         jobPosting.applicationDeadline = applicationDeadline
         jobPosting.status = status
+        jobPosting.skills = skillIds
+
+
 
         await jobPosting.save();
 
-        return res.status(200).json({ message: 'Job posting updated successfully' });
+        return res.status(200).json(jobPosting);
 
     } catch (error) {
         res.status(500).json({ error: `Failed to edit job posting: ${error}` });
     }
 
+})
+
+
+// Get the the categories with there skills 
+router.get('/categories-with-skills', validateToken('admin'), async (req, res) => {
+    try {
+        // Find skills without a category (uncategorized skills)
+        const uncategorizedSkills = await Skill.find({
+            $or: [{ categoryId: { $exists: false } }, { categoryId: null }]
+        }).select("name");
+
+        // Create an entry for uncategorized skills at the top
+        const categoriesWithSkills = [{
+            category: { name: "Uncategorized" },
+            skills: uncategorizedSkills
+        }];
+
+        // Find all categories
+        const categories = await Category.find();
+
+        // For each category, find the related skills and append them after "Uncategorized"
+        const categorizedSkills = await Promise.all(
+            categories.map(async (category) => {
+                const skills = await Skill.find({ categoryId: category._id }).select("name");
+                return {
+                    category: category,
+                    skills: skills
+                };
+            })
+        );
+
+        // Append categorized skills after "Uncategorized"
+        categoriesWithSkills.push(...categorizedSkills);
+
+        res.status(200).json(categoriesWithSkills);
+    } catch (error) {
+        res.status(500).json({ error: `Failed to retrieve categories and skills: ${error.message}` });
+    }
+});
+
+// Get all the skills
+router.get('/all-skills', validateToken([]), async (req, res) => {
+    try {
+        const skills = await Skill.find({}).select("name")
+
+        res.status(200).json(skills)
+
+    } catch (error) {
+        res.status(500).json({ error: `Failed to get skills: ${error.message}` });
+    }
+})
+
+// Add a category without skills
+router.post('/add-category', validateToken(["admin"]), async (req, res) => {
+    const { categoryName } = req.body
+
+    const categoryNameFormatted = categoryName.toLowerCase()
+
+    const newCategory = new Category({
+        name: categoryNameFormatted
+    })
+
+    try {
+        await newCategory.save()
+
+        res.status(200).json("success")
+
+    } catch (error) {
+        res.status(500).json({ error: `Failed to create categories: ${error.message}` });
+    }
 
 })
+
+// Set skills to a category
+router.put('/categories-skills', validateToken(["admin"]), async (req, res) => {
+    const { category: catigoryId, skills } = req.body
+
+    try {
+        for (let skill of skills) {
+
+            const dbSkill = await Skill.findById(skill._id)
+
+            if (!dbSkill) {
+                return console.log("this skill isn't found", skill.name);
+            }
+
+            dbSkill.categoryId = catigoryId
+            await dbSkill.save()
+        }
+        res.status(200).json(skills)
+
+    } catch (err) {
+        res.status(500).json({ error: `Failed to edit skills: ${err}` });
+    }
+})
+
+// Add and rename skills from a category and also rename the category
+router.put('/edit-category-with-its-skills', validateToken(["admin"]), async (req, res) => {
+    const { category, skills } = req.body
+
+    try {
+
+        const dbCategory = await Category.findById(category._id);
+
+        if (!dbCategory) {
+            res.status(404).json({ error: "there is no such category" })
+        }
+
+        if (dbCategory.name !== category.name) {
+            dbCategory.name = category.name
+            dbCategory.save()
+        }
+
+        for (const skill of skills) {
+
+            const dbSkill = await Skill.findById(skill._id)
+
+            if (!dbSkill) {
+                const newSkill = new Skill({
+                    name: skill.name,
+                    categoryId: category._id
+                })
+                newSkill.save()
+            } else {
+                if (dbSkill.name !== skill.name) {
+                    dbSkill.name = skill.name
+                    dbSkill.save()
+                }
+            }
+        }
+
+        res.json(skills)
+
+
+    } catch (err) {
+        res.status(500).json({ error: `Failed to edit category: ${err}` });
+    }
+})
+
+
+router.delete('/delete-skill/:id', validateToken(['admin']), async (req, res) => {
+    const id = req.params.id
+    try {
+        const dbSkill = await Skill.findById(id)
+        if (!dbSkill) {
+            res.status(404).json({ error: "skill not found" })
+        }
+        await dbSkill.deleteOne()
+
+        res.status(200).json(dbSkill)
+
+    } catch (err) {
+        res.status(500).json({ error: `Failed to delete skill: ${err}` });
+    }
+})
+
+router.delete('/delete-category/:id', validateToken(['admin']), async (req, res) => {
+    const id = req.params.id
+    try {
+        const dbCategory = await Category.findById(id)
+        await dbCategory.deleteOne()
+
+        res.status(200).json(dbCategory)
+
+    } catch (err) {
+        res.status(500).json({ error: `Failed to delete category: ${err}` });
+    }
+})
+
+
+
+
+
 
 
 module.exports = router

@@ -56,15 +56,17 @@ const employeeSchema = new mongoose.Schema({
         type: String,
         required: false
     },
-    skills: [
+
+    employeeSkills: [
         {
-            name: {
-                type: String,
+            skillId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Skill',
                 required: true
             },
             level: {
                 type: String,
-                default:"0"
+                default: "0"
             },
         }
     ]

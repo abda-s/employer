@@ -11,9 +11,9 @@ const router = express.Router();
 
 
 router.get("/employee", validateToken(["employee"]), async (req, res) => {
-    const userId = req.user.id;    
+    const userId = req.user.id;
     try {
-        const employee = await Employee.findOne({userId})
+        const employee = await Employee.findOne({ userId })
 
         if (!employee) {
             return res.status(404).json({ error: 'Employee not found' });
@@ -22,12 +22,12 @@ router.get("/employee", validateToken(["employee"]), async (req, res) => {
         const employeeId = employee._id
 
         const applications = await Application.find({ employeeId })
-        .select("jobPostingId applicationDate coverLetter") // Select fields from the Application model
-        .populate({
-            path: "jobPostingId", // Populate the jobPostingId field
-            select: "jobTitle companyName location description requirements status" // Select specific fields from the JobPosting model
-        });
-    
+            .select("jobPostingId applicationDate coverLetter") // Select fields from the Application model
+            .populate({
+                path: "jobPostingId", // Populate the jobPostingId field
+                select: "jobTitle companyName location description requirements status" // Select specific fields from the JobPosting model
+            });
+
         res.status(200).json(applications)
 
 
@@ -70,7 +70,7 @@ router.post('/', validateToken(["employee"]), async (req, res) => {
 
 router.get('/', validateToken(["employer"]), async (req, res) => {
 
-    
+
     const userId = req.user.id;
 
     try {
@@ -92,37 +92,37 @@ router.get('/', validateToken(["employer"]), async (req, res) => {
     }
 });
 
-router.get('/get-application/:id', validateToken(["employer"]), async (req, res) => {
+router.get('/get-application/:id', validateToken(["employer", "admin"]), async (req, res) => {
     const userId = req.user.id;
     const jobPostingId = req.params.id;
 
     try {
-        // Find the employer by userId
-        const employer = await Employer.findOne({ userId });
-
-        if (!employer) {
-            return res.status(404).json({ error: 'Employer not found' });
-        }
-
-        const employerId = employer._id;
-
-        // Find the job posting by id and ensure it belongs to the employer
-        const jobPosting = await JobPosting.findOne({ _id: jobPostingId, employerId });
+        // Find the job posting by id
+        const jobPosting = await JobPosting.findById(jobPostingId)
+            .populate({
+                path: 'skills', // Populate skills field
+                select: 'name' // Select relevant fields from skills
+            });
 
         if (!jobPosting) {
-            return res.status(404).json({ error: 'Job posting not found or not owned by this employer' });
+            return res.status(404).json({ error: 'Job posting not found' });
         }
 
-        // Find applications for the job posting and populate the employee details
+        // Find applications for the job posting and populate all related fields
         const applications = await Application.find({ jobPostingId })
             .populate({
                 path: 'employeeId',
                 populate: {
-                    path: 'userId', // This populates the userId within the employeeId
+                    path: 'userId', // Populate the userId within employeeId
                     select: 'email' // Select only the email field from the userId document
                 }
             })
-            .populate('jobPostingId');
+            .populate({
+                path: 'jobPostingId' // Populate all fields within jobPostingId
+                // No select field needed if you want to include all fields
+            })
+
+
         // Add applications array to the jobPosting object
         const jobPostingWithApplications = {
             ...jobPosting.toObject(), // Convert Mongoose document to plain JavaScript object
@@ -134,6 +134,7 @@ router.get('/get-application/:id', validateToken(["employer"]), async (req, res)
         res.status(500).json({ error: `Failed to get job posting with applications: ${error.message}` });
     }
 });
+
 
 
 router.put('/', validateToken(["employer"]), async (req, res) => {

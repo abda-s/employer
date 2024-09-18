@@ -35,7 +35,21 @@ const jobPostingSchema = new mongoose.Schema({
         enum: ['active', 'expired'],
         default: "active"
     },
+
+    skills: {
+        type: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Skill'
+        }],
+        required: true,
+        validate: [arrayLimit, 'The skills array should have at least one item']
+    }
+
 }, { timestamps: true });
+
+function arrayLimit(val) {
+    return val.length > 0;  // Ensures that the array has at least one item
+}
 
 const JobPosting = mongoose.model('JobPosting', jobPostingSchema);
 

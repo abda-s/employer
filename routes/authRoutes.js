@@ -8,6 +8,7 @@ const dotenv = require("dotenv");
 const { validateToken } = require("../middlewares/AuthMiddlewares");
 const Employer = require("../models/Employer");
 const Employee = require("../models/Employee");
+const Skill = require("../models/Skill");
 dotenv.config();
 
 
@@ -135,13 +136,17 @@ router.post('/employee', validateToken([]), async (req, res) => {
     }
 
     try {
+        const employeeSkills = skills.map((skill) => ({
+            skillId: skill._id
+        }));
+
         // Create a new Employee document
         const employee = new Employee({
             userId,
             fullName,
             phoneNumber,
             professionalSummary,
-            skills,
+            employeeSkills,
             experience,
             education,
         });
@@ -174,10 +179,12 @@ router.post('/employee', validateToken([]), async (req, res) => {
 });
 
 
-router.post('/employee-data', validateToken(['employee']), async (req, res) => {
+router.get('/employee-data', validateToken(['employee']), async (req, res) => {
     const { id } = req.user
     try {
-        const employee = await Employee.findOne({ userId: id }).populate({ path: "userId", select: 'email' })
+        const employee = await Employee.findOne({ userId: id })
+        .populate({ path: "userId", select: 'email' })
+        .populate({ path: 'employeeSkills.skillId', select: 'name' })
 
         if (!employee) {
             res.status(500).json({ error: "employee not found" })
@@ -383,7 +390,7 @@ router.delete('/experience/:id', validateToken(["employee"]), async (req, res) =
 
 router.put('/edit-skill', validateToken(["employee"]), async (req, res) => {
     const id = req.user.id;
-    const { skillsIndex, name, level } = req.body;
+    const { skillsIndex, level } = req.body;
 
     try {
         const employee = await Employee.findOne({ userId: id });
@@ -392,13 +399,12 @@ router.put('/edit-skill', validateToken(["employee"]), async (req, res) => {
         }
 
         // Check if the educationIndex is valid
-        if (skillsIndex < 0 || skillsIndex >= employee.skills.length) {
+        if (skillsIndex < 0 || skillsIndex >= employee.employeeSkills.length) {
             return res.status(400).json({ error: "Invalid skills index" });
         }
 
         // Update the specific fields in the education array
-        employee.skills[skillsIndex].name = name;
-        employee.skills[skillsIndex].level = level;
+        employee.employeeSkills[skillsIndex].level = level;
 
         // Save the updated document
         await employee.save();
@@ -412,7 +418,7 @@ router.put('/edit-skill', validateToken(["employee"]), async (req, res) => {
 
 router.put("/add-skill", validateToken(["employee"]), async (req, res) => {
     const id = req.user.id;
-    const { name, level } = req.body;
+    const { skillId, level } = req.body;
 
     try {
         // Find the employee by userId
@@ -422,49 +428,69 @@ router.put("/add-skill", validateToken(["employee"]), async (req, res) => {
             return res.status(404).json({ error: "Employee not found" });
         }
 
-        // Add the new education entry to the education array
-        employee.skills.push({
-            name, level
-        });
+        // Check if the skill exists in the database
+        let dbSkill = await Skill.findById(skillId._id);
+
+        // If the skill doesn't exist, create a new one
+        if (!dbSkill) {
+            dbSkill = new Skill({ name: skillId.name });
+            await dbSkill.save();
+        }
+
+        // Check if the employee already has this skill
+        const existingSkill = employee.employeeSkills.find(
+            (empSkill) => empSkill.skillId.toString() === dbSkill._id.toString()
+        );
+
+        if (existingSkill) {
+            return res.status(400).json({ error: "Skill already exists for the employee" });
+        }
+
+        // Add the new skill to the employeeSkills array
+        const newEmployeeSkill = {
+            skillId: dbSkill._id,
+            level: level,
+        };
+
+        employee.employeeSkills.push(newEmployeeSkill);
 
         // Save the updated employee document
         await employee.save();
 
-        res.json("success");
+        res.json({ message: "Skill added successfully" });
     } catch (err) {
         res.status(500).json({ error: err.message });
-        console.log(err);
+        console.error(err);
     }
 });
 
 router.delete('/skill/:id', validateToken(["employee"]), async (req, res) => {
-    const userId = req.user.id
-    const skillsIndex = req.params.id
+    const userId = req.user.id;
+    const skillsIndex = parseInt(req.params.id, 10); // Convert skillsIndex to an integer
 
-    const employee = await Employee.findOne({ userId });
     try {
+        const employee = await Employee.findOne({ userId });
 
         if (!employee) {
             return res.status(404).json({ error: "Employee not found" });
         }
 
         // Validate the index
-        if (skillsIndex < 0 || skillsIndex >= employee.skills.length) {
+        if (isNaN(skillsIndex) || skillsIndex < 0 || skillsIndex >= employee.employeeSkills.length) {
             return res.status(400).json({ error: "Invalid skill index" });
         }
 
-        // Remove the education entry at the specified index
-        employee.skills.splice(skillsIndex, 1);
+        // Remove the skill entry at the specified index
+        employee.employeeSkills.splice(skillsIndex, 1);
 
         await employee.save();
-        res.json("success");
-
+        res.json({ message: "Skill removed successfully" });
 
     } catch (err) {
         res.status(500).json({ error: err.message });
-        console.log(err);
+        console.error(err);
     }
+});
 
-})
 
 module.exports = router
