@@ -1,0 +1,23 @@
+.signup-con {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 480px;
+    justify-content: center;
+    padding: 10px;
+    border-radius: 20px;
+
+}
+
+.signup-image-con {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+}
+
+@media only screen and (max-width: 500px) {
+    .signup-image-con {
+        display: none;
+    }
+}
