@@ -1,0 +1,74 @@
+.application-view {
+  display: flex;
+  flex: 1.2;
+}
+
+.requirements-container {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.requirements-container span {
+  font-size: 12px;
+  padding: 5px;
+  background: #fff2e0;
+  color: #f25c05;
+  border-radius: 5px;
+  border: solid 1px #f25c05;
+  margin-left: 5px;
+}
+
+.job-posting {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  margin: 10px;
+  background: white;
+  /* width: 100%; */
+
+  box-shadow: 2px 2px 2px 1px rgb(0 0 0 / 20%);
+  border-radius: 10px;
+}
+
+.app-side-menu-item {
+  padding: 10px;
+  border-bottom-color: #757475;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  display: flex;
+  flex-direction: column;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+}
+
+.app-side-menu-item:hover {
+  background-color: #f0eeeb;
+}
+
+.job-posting-item {
+  display: flex;
+  /* width: 100%; */
+  box-sizing: border-box;
+  flex-direction: column;
+  padding: 15px;
+  background: white;
+  border-bottom: solid 2px #f0eeeb;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+}
+
+.job-posting-item:hover {
+  background: #f0eeeb;
+}
+
+
+.job-posting-view-con {
+  display: flex;
+  width: 100%;
+  height: 100%; /* or a fixed height, e.g., 500px */
+  flex-direction: column;
+  box-sizing: border-box;
+  overflow-y: auto; /* Enables vertical scrolling */
+}

@@ -1,0 +1,14 @@
+.applied-jobs-table{
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+  }
+
+.applied-jobs-table::-webkit-scrollbar {
+    display: none;
+    /* Hides the scrollbar */
+}

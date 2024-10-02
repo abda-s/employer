@@ -1,0 +1,193 @@
+.personal-info-con {
+    flex-direction: column;
+  }
+  
+  .MuiDataGrid-cell {
+    display: flex;
+    align-items: center;
+  }
+  
+  .cv-section {
+    color: white;
+    font-size: 20px;
+    text-transform: uppercase;
+    background: #1f4c63;
+    padding: 7px 10px 7px 10px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .cv-canvas-con {
+    display: flex;
+    width: 100%;
+    background: white;
+    margin: 0;
+    --aspect-ratio: 1.414;
+    height: calc(100% * var(--aspect-ratio));
+  }
+
+
+
+.cv-canvas-left {
+    flex: 1;
+    background: #013147;
+    display: flex;
+    flex-direction: column;
+}
+
+.cv-left-content {
+    margin: 25px;
+    display: flex;
+    flex-direction: column;
+}
+
+.cv-name {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.cv-fullName {
+    color: white;
+    font-size: 35px;
+    text-transform: capitalize;
+}
+
+.cv-contact-info {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.cv-contact-item {
+    display: flex;
+    align-items: center;
+    color: white;
+    font-size: 20px;
+    margin-top: 15px;
+}
+
+.cv-icon {
+    margin-right: 5px;
+}
+
+.email-icon {
+    color: #179de0;
+}
+
+.phone-icon {
+    color: #179de0;
+}
+
+.cv-section-container {
+    margin-top: 30px;
+    margin-bottom: 20px;
+}
+
+.cv-education-item {
+    margin-top: 20px;
+}
+
+.cv-education-year {
+    color: #179de0;
+    font-size: 18px;
+    margin-bottom: 7px;
+}
+
+.cv-education-details {
+    font-size: 18px;
+}
+
+.cv-degree {
+    color: white;
+    font-weight: 600;
+}
+
+.cv-institution {
+    color: white;
+    font-style: italic;
+}
+
+.cv-skill-item {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.cv-skill-name {
+    color: white;
+    text-transform: capitalize;
+    margin-left: 10px;
+    flex: 1;
+}
+
+.cv-skill-bar {
+    flex: 2;
+    width: 100%;
+    height: 5px;
+    background: #011826;
+}
+
+.cv-skill-level {
+    height: 100%;
+    background: #1ba3db;
+}
+
+.cv-canvas-right {
+    flex: 1;
+    background: white;
+    display: flex;
+    flex-direction: column;
+}
+
+.cv-right-content {
+    margin: 25px;
+    display: flex;
+    flex-direction: column;
+}
+
+.cv-profile-title, .cv-experience-title {
+    text-transform: uppercase;
+    color: #013147;
+    font-weight: 700;
+    font-size: 25px;
+    margin-bottom: 10px;
+    margin-top: 20px;
+}
+
+.cv-profile-summary {
+    color: GrayText;
+}
+
+.cv-experience-item {
+    display: flex;
+    margin-top: 20px;
+}
+
+.exp-left-con, .exp-right-con {
+    flex: 1;
+}
+
+.exp-left-con h3, .exp-right-con h3 {
+    margin: 0;
+    color: #013147;
+}
+
+@media print {
+    @page {
+      margin: 0;
+      /* Remove default page margins */
+    }
+  
+    body {
+      margin: 0;
+      /* Remove margins from the body */
+    }
+  
+    .cv-canvas-con {
+      display: flex;
+      flex: 1;
+      padding: 0;
+      margin: 0;
+      width: 100%;
+      height: 100vh;
+    }
+  }
