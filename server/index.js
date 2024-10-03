@@ -11,7 +11,13 @@ const port = process.env.PORT || 4000;
 
 
 app.use(express.json());
-app.use(cors());
+
+app.use(cors({
+    origin: '*', // Allow access from any origin
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Specify allowed methods (if needed)
+}));
+
+
 const dbURL = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.si1mhne.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority&appName=Cluster0`;
 
 mongoose.connect(dbURL)

@@ -1,8 +1,10 @@
 import { Box, Button, Typography, } from '@mui/material'
 import React from 'react'
 import logo from '../../assetes/employer-high-resolution-logo-transparent-orange.png';
+import { useNavigate } from 'react-router-dom';
 
 function HomepageNavBar() {
+    const navigate = useNavigate();
     return (
         <Box
             sx={{
@@ -25,8 +27,8 @@ function HomepageNavBar() {
                 <img src={logo} alt="logo" style={{ height: "40px", marginRight: 2 }} />
             </Box>
             <Box sx={{ display: "flex", alignItems: "center", px: 2, gap: 2, }} >
-                <Button variant="contained">Sign In</Button>
-                <Button variant="outlined">Sign Up</Button>
+                <Button variant="contained" onClick={() => navigate('/login')} >Sign In</Button>
+                <Button variant="outlined" onClick={() => navigate('/signup')} >Sign Up</Button>
             </Box>
         </Box>
     );
