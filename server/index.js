@@ -7,7 +7,8 @@ dotenv.config();
 
 
 const app = express();
-const PORT = 3001;
+const port = process.env.PORT || 4000;
+
 
 app.use(express.json());
 app.use(cors());
@@ -16,7 +17,7 @@ const dbURL = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@c
 mongoose.connect(dbURL)
     .then(res => {
         console.log("connected to db")
-        app.listen(PORT)
+        app.listen(port)
 
     })
     .catch(err => {
