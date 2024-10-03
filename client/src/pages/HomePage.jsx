@@ -3,6 +3,7 @@ import NavBar from './components/NavBar'
 import { Box, Button, Typography, useMediaQuery } from '@mui/material'
 import landingPageImage from '../assetes/landingPageImage.png'
 import { useNavigate } from 'react-router-dom'
+import HomepageNavBar from './components/HomepageNavBar'
 
 function HomePage() {
     const navigate = useNavigate()
@@ -15,14 +16,15 @@ function HomePage() {
     ]
 
     return (
-        <div style={{ width: "100%", height: "100vh", background: "#ffffff", }} >
-            <NavBar title="Home" />
+        <div style={{ width: "100vw", height: "100vh", background: "#ffffff", boxSizing: "border-box" }} >
+
+                <HomepageNavBar />
 
             <Box sx={{ display: "flex", width: "100vw", overflowY: "auto", height: "100%", padding: isMobile ? "30px" : "80px", boxSizing: "border-box" }} >
                 <Box sx={{ display: "flex", flex: 1 }}>
 
                     <Box sx={{ display: "flex", flexDirection: "column", mt: isMobile ? 2 : 4 }} >
-                        <Typography variant='h2' sx={{ fontWeight: 600, textAlign:  "left" }} >
+                        <Typography variant='h2' sx={{ fontWeight: 600, textAlign: "left" }} >
                             Jobs made easy
                         </Typography>
                         <Typography variant='h2' sx={{ fontWeight: 600, textAlign: "left" }} >
