@@ -1,47 +1,47 @@
 import React, { useEffect } from 'react'
-import axios from 'axios'
 import { useDispatch, useSelector } from 'react-redux'
 import { initCV } from '../redux'
-
 
 import '../styles/CVBuilderPage.css'
 import NavBar from "../components/NavBar"
 import SideBarBuilder from "../components/cvBuilder/SideBarBuilder"
 import CVCanvas from "../components/cvBuilder/CVCanvas"
 import { serverURL } from '../constants'
+import { useAxios } from '../hooks/useAxios'
 
 function CVBuilderPage() {
-  const accessToken = useSelector(state => state.auth.token)
   const cv = useSelector(state => state?.cv)
-
   const dispatch = useDispatch()
 
+  const { response, error } = useAxios({
+    url: `${serverURL}/auth/employee-data`,
+    method: 'GET',
+  })
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${serverURL}/auth/employee-data`, {
-          headers: { accessToken }
-          
-        });
+    if (response && (!response.error || error)) {
 
-        const { userId, fullName, phoneNumber, professionalSummary, employeeSkills, education, experience } = response.data;
+      const { userId,
+        fullName,
+        phoneNumber,
+        professionalSummary,
+        employeeSkills,
+        education,
+        experience
+      } = response;
 
-        dispatch(initCV(
-          userId,
-          fullName,
-          phoneNumber,
-          professionalSummary,
-          employeeSkills,
-          education,
-          experience
-        ));
-      } catch (error) {
-        console.error("Error fetching employee data", error);
-      }
-    };
+      dispatch(initCV(
+        userId,
+        fullName,
+        phoneNumber,
+        professionalSummary,
+        employeeSkills,
+        education,
+        experience
+      ));
+    }
 
-    fetchData();
-  }, [dispatch, accessToken]);
+  }, [dispatch, response]);
 
 
 

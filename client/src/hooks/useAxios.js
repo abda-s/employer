@@ -30,6 +30,8 @@ export const useAxios = ({ url, method, manual = false, dependencies = [] }) => 
             });
 
             setResponse(res.data);
+            console.log(res.data);
+            
             return res.data; // Return the response data
 
         } catch (err) {
