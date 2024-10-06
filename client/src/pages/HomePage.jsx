@@ -1,9 +1,9 @@
 import React from 'react'
-import NavBar from './components/NavBar'
+import NavBar from '../components/NavBar'
 import { Box, Button, Typography, useMediaQuery } from '@mui/material'
 import landingPageImage from '../assetes/landingPageImage.png'
 import { useNavigate } from 'react-router-dom'
-import HomepageNavBar from './components/HomepageNavBar'
+import HomepageNavBar from '../components/HomepageNavBar'
 
 function HomePage() {
     const navigate = useNavigate()

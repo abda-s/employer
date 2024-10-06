@@ -1,6 +1,6 @@
 import React from 'react'
-import SignupForm from './components/LoginAndSignup/SignupForm'
-import SignupPageLayout from './components/LoginAndSignup/SignupPageLayout'
+import SignupForm from '../components/LoginAndSignup/SignupForm'
+import SignupPageLayout from '../components/LoginAndSignup/SignupPageLayout'
 function SignupPage() {
 
 

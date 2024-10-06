@@ -1,12 +1,14 @@
-import React, { useEffect, useState } from 'react'
-import NavBar from "./components/NavBar"
-import SideBarBuilder from "./components/CVBuilder/SideBarBuilder"
-import CVCanvas from "./components/CVBuilder/CVCanvas"
+import React, { useEffect } from 'react'
 import axios from 'axios'
-import { serverURL } from '../constants'
 import { useDispatch, useSelector } from 'react-redux'
 import { initCV } from '../redux'
+
+
 import '../styles/CVBuilderPage.css'
+import NavBar from "../components/NavBar"
+import SideBarBuilder from "../components/CVBuilder/SideBarBuilder"
+import CVCanvas from "../components/CVBuilder/CVCanvas"
+import { serverURL } from '../constants'
 
 function CVBuilderPage() {
   const accessToken = useSelector(state => state.auth.token)
@@ -19,6 +21,7 @@ function CVBuilderPage() {
       try {
         const response = await axios.get(`${serverURL}/auth/employee-data`, {
           headers: { accessToken }
+          
         });
 
         const { userId, fullName, phoneNumber, professionalSummary, employeeSkills, education, experience } = response.data;

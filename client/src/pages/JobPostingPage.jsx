@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import NavBar from './components/NavBar';
+import NavBar from '../components/NavBar';
 import { Button, CircularProgress } from '@mui/material';
 import { useSelector } from 'react-redux';
 import AddIcon from '@mui/icons-material/Add';
@@ -7,10 +7,9 @@ import axios from 'axios';
 import { serverURL } from '../constants';
 import "../styles/JobPostingPage.css"
 
-import ApplicationView from './components/JobPostingPage/application/ApplicationView';
-import JobPostingsView from './components/JobPostingPage/JobPostingsView';
-import JobPostingModal from './components/JobPostingPage/JobPostingModal';
-import DashboradSideMenu from './components/DashboradSideMenu';
+import ApplicationView from '../components/JobPostingPage/application/ApplicationView';
+import JobPostingsView from '../components/JobPostingPage/JobPostingsView';
+import JobPostingModal from '../components/JobPostingPage/JobPostingModal';
 
 function JobPostingPage() {
     const [isVisible, setIsVisible] = useState(false);

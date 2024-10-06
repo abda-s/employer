@@ -1,7 +1,7 @@
 import React from 'react'
-import DashboardLayout from "./components/DashboardLayout"
+import DashboardLayout from "../components/DashboardLayout"
 import { useNavigate, useParams } from 'react-router-dom';
-import ApplicationView from './components/JobPostingPage/application/ApplicationView';
+import ApplicationView from '../components/JobPostingPage/application/ApplicationView';
 import { Box } from '@mui/material';
 
 function JobPostingDetails() {
