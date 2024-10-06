@@ -1,40 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import axios from 'axios'; // Assuming you use axios for the request
-import { serverURL } from '../constants';
-import { useSelector } from 'react-redux';
+import { useAxios } from '../hooks/useAxios';
 
 function AppliedJobsTable() {
-    const accessToken = useSelector(state => state.auth.token)
+    const { response: jobs, error, isLoading } = useAxios({ url: `/application/applied-jobs`, method: 'GET' });
     const [rows, setRows] = useState([]);
-    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Fetch the data from your API
-        const fetchData = async () => {
-            try {
-                const response = await axios.get(`${serverURL}/application/applied-jobs`, { headers: { accessToken } }); // Replace with your API endpoint
-                const data = response.data;
+        if (error) {
+            console.log('Error fetching applied jobs:', error);
+            return;
+        }
 
-                // Transform the data into the structure expected by DataGrid
-                const formattedRows = data.map((item) => ({
-                    id: item._id, // Use _id as the row id
-                    jobTitle: item.jobPostingId.jobTitle,
-                    companyName: item.jobPostingId.companyName,
-                    skills: item.jobPostingId.skills.map(skill => skill.name).join(', '), // Convert array to string
-                    applicationDate: new Date(item.applicationDate).toLocaleDateString(), // Format the date
-                }));
-                setRows(formattedRows);
-            } catch (error) {
-                console.error("Error fetching data: ", error);
-            } finally {
-                setLoading(false);
-            }
-        };
+        // Transform the data into the structure expected by DataGrid
+        const formattedRows = jobs?.map((item) => ({
+            id: item._id, // Use _id as the row id
+            jobTitle: item.jobPostingId.jobTitle,
+            companyName: item.jobPostingId.companyName,
+            skills: item.jobPostingId.skills.map(skill => skill.name).join(', '), // Convert array to string
+            applicationDate: new Date(item.applicationDate).toLocaleDateString(), // Format the date
+        }));
+        setRows(formattedRows);
 
-        fetchData();
-    }, []); // Empty dependency array means this effect runs once when the component mounts
+    }, [jobs, isLoading, error]); // Add isLoading and error to the dependency array
 
     const columns = [
         {
@@ -65,10 +54,11 @@ function AppliedJobsTable() {
 
     return (
         <Box sx={{ width: '100%' }}>
+            {error && <div style={{ color: 'red' }}>Error fetching applied jobs: {error.message}</div>}
             <DataGrid
                 rows={rows}
                 columns={columns}
-                loading={loading} // Show a loading indicator until data is loaded
+                loading={isLoading} // Show a loading indicator until data is loaded
                 disableColumnMenu
                 autoHeight
             />
@@ -77,3 +67,4 @@ function AppliedJobsTable() {
 }
 
 export default AppliedJobsTable;
+
