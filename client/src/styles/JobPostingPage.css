@@ -9,7 +9,7 @@
   flex-wrap: wrap;
 }
 
-.requirements-container span {
+.requirement {
   font-size: 12px;
   padding: 5px;
   background: #fff2e0;

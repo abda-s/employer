@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { IconButton } from '@mui/material';
+import { Box, IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import moment from 'moment';
 import JobEditModal from './JobEditModal';
@@ -31,58 +31,59 @@ const JobPostingDetails = ({ data, setIsEditVisibile, setToRefresh, isEditVisibi
     }, []);
 
     return (
-        <div className='job-posting'>
+        <Box className='job-posting'>
             {/* Job details */}
-            <div style={{ display: "flex", marginBottom: "13px", textTransform: "capitalize" }}>
-                <div style={{ fontSize: "16px", flex: 1 }}>
-                    <strong style={{ fontSize: "14px" }}>Company Name:</strong> {data?.companyName}
-                </div>
-                <div style={{ fontSize: "16px", flex: 1 }}>
-                    <strong style={{ fontSize: "14px" }}>Location:</strong> {data?.location}
-                </div>
-            </div>
-            <div style={{ display: "flex", marginBottom: "13px" }}>
-                <div style={{ fontSize: "16px", flex: 1, textTransform: "capitalize" }}>
-                    <strong style={{ fontSize: "14px" }}>Job Title:</strong> {data?.jobTitle}
-                </div>
-                <div style={{ flex: 1, flexWrap: "wrap", display: "flex" }}>
-                    <strong style={{ fontSize: "14px" }}>Requirements:</strong>
-                    <div className="requirements-container">
+            <Box display="flex" marginBottom="13px" textTransform="capitalize">
+                <Box fontSize="16px" flex={1}>
+                    <strong fontSize="14px">Company Name:</strong> {data?.companyName}
+                </Box>
+                <Box fontSize="16px" flex={1}>
+                    <strong fontSize="14px">Location:</strong> {data?.location}
+                </Box>
+            </Box>
+            <Box display="flex" marginBottom="13px">
+                <Box fontSize="16px" flex={1} textTransform="capitalize">
+                    <strong fontSize="14px">Job Title:</strong> {data?.jobTitle}
+                </Box>
+                <Box flex={1} flexWrap="wrap" display="flex">
+                    <strong fontSize="14px">Requirements:</strong>
+                    <Box className="requirements-container">
                         {data?.skills?.map((item, index) => (
-                            <span key={index}>
+                            <Box className="requirement"  key={index}>
                                 {item?.name}
-                            </span>
+                            </Box>
                         ))}
-                    </div>
-                </div>
-            </div>
-            <div style={{ display: "flex", marginBottom: "13px", textTransform: "capitalize" }}>
-                <div style={{ fontSize: "16px", flex: 1 }}>
-                    <strong style={{ fontSize: "14px" }}>Application Deadline:</strong> {moment(data?.applicationDeadline).format("YYYY/MM/DD")}
-                </div>
-                <div style={{ flex: 1 }}>
-                    <strong style={{ fontSize: "14px" }}>Status:</strong> {data?.status}
-                </div>
-            </div>
-            <div style={{ display: "flex", width: "100%", justifyContent: "flex-start", alignItems: "flex-start" }}>
-                <div style={{ marginBottom: "10px", fontSize: "16px", color: "GrayText" }}>
-                    <strong style={{ fontSize: "14px", color: "black" }}>Description:</strong>
+                    </Box>
+                </Box>
+            </Box>
+            <Box display="flex" marginBottom="13px" textTransform="capitalize">
+                <Box fontSize="16px" flex={1}>
+                    <strong fontSize="14px">Application Deadline:</strong> {moment(data?.applicationDeadline).format("YYYY/MM/DD")}
+                </Box>
+                <Box flex={1}>
+                    <strong fontSize="14px">Status:</strong> {data?.status}
+                </Box>
+            </Box>
+            <Box display="flex" width="100%" justifyContent="flex-start" alignItems="flex-start">
+                <Box marginBottom="10px" fontSize="16px" color="GrayText">
+                    <strong fontSize="14px" color="black">Description:</strong>
                     {data?.description}
-                </div>
-                <div style={{ alignSelf: "flex-start" }}>
+                </Box>
+                <Box alignSelf="flex-start">
                     <IconButton onClick={() => setIsEditVisibile(true)}>
                         <EditIcon color='primary' />
                     </IconButton>
-                </div>
-            </div>
+                </Box>
+            </Box>
             <JobEditModal
                 jobData={data}
                 isVisible={isEditVisibile}
                 onClose={() => setIsEditVisibile(false)}
                 setToRefresh={e => setToRefresh(e)}
             />
-        </div>
+        </Box>
     );
 };
 
 export default JobPostingDetails;
+
