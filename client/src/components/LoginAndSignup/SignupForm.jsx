@@ -3,9 +3,8 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { TextField, Button, FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton } from '@mui/material';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import axios from "axios"
-import { serverURL } from '../../constants';
 import { useNavigate } from 'react-router-dom';
+import { useAxios } from '../../hooks/useAxios';
 
 const SignupValidationSchema = Yup.object({
     email: Yup.string().email('Invalid email address').required('Required'),
@@ -23,16 +22,25 @@ function SignupForm() {
     const [error, setError] = useState('');
     const navigate = useNavigate()
 
-    const signupReq = (email, password) => {
-        axios.post(`${serverURL}/auth/signup`, { email, password })
-            .then(response => {
-                if (response.data.error) {
-                    setError(response.data.error)
-                } else {
-                    navigate('/login')
-                }
+    const { isLoading, fetchData } = useAxios({
+        url: '/auth/signup',
+        method: 'POST',
+        manual: true
+    })
 
-            })
+    const signupReq = async (values) => {
+        const result = await fetchData({ body: values })
+        try{
+            if (result && !result.error) {
+                navigate('/login')}
+            else {
+                setError(result?.error)
+            }
+
+        }
+        catch(err){
+            console.log(err.message)
+        }
     }
 
     return (
@@ -41,7 +49,7 @@ function SignupForm() {
             initialValues={{ email: '', password: '', confirmPassword: '' }}
             validationSchema={SignupValidationSchema}
             onSubmit={(values) => {
-                signupReq(values.email, values.password)
+                signupReq(values)
             }}
         >
             {({ values, handleChange, handleBlur, handleSubmit }) => (
@@ -119,8 +127,9 @@ function SignupForm() {
                         color="primary"
                         type="submit"
                         sx={{ marginBottom: "10px", flex: 1, width: "100%" }}
+                        disabled={isLoading}
                     >
-                        Sign up
+                        {isLoading ? "Loading..." : "Sign up"}
                     </Button>
                 </Form>
             )}

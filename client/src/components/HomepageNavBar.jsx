@@ -1,4 +1,4 @@
-import { Box, Button, Typography, useMediaQuery } from '@mui/material'
+import { Box, Button, useMediaQuery } from '@mui/material'
 import React from 'react'
 import logo from '../assetes/employer-high-resolution-logo-transparent-orange.png';
 import { useNavigate } from 'react-router-dom';

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { DataGrid} from '@mui/x-data-grid';
 import { useAxios } from '../hooks/useAxios';
 
 function AppliedJobsTable() {
