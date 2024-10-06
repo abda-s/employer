@@ -13,7 +13,7 @@ const port = process.env.PORT || 4000;
 app.use(express.json());
 
 app.use(cors({
-    origin: 'https://employer-frontend.onrender.com', // Replace '*' with your specific frontend URL
+    origin: ['https://employer-frontend.onrender.com', 'http://localhost:3000'], // Array of allowed origins
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Specify allowed methods (if needed)
 }));
 

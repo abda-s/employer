@@ -20,7 +20,7 @@ function HomePage() {
 
                 <HomepageNavBar />
 
-            <Box sx={{ display: "flex", width: "100vw", overflowY: "auto", height: "100%", padding: isMobile ? "30px" : "80px", boxSizing: "border-box" }} >
+            <Box sx={{ display: "flex", width: "100vw", overflowY: "auto", padding: isMobile ? "30px" : "80px", boxSizing: "border-box" }} >
                 <Box sx={{ display: "flex", flex: 1 }}>
 
                     <Box sx={{ display: "flex", flexDirection: "column", mt: isMobile ? 2 : 4 }} >
@@ -31,7 +31,7 @@ function HomePage() {
                             Worldwide
                         </Typography>
 
-                        <Typography variant='body1' sx={{ marginTop: 3, maxWidth: isMobile ? "100%" : "500px", textAlign: "left" }}>
+                        <Typography variant='body1' sx={{ marginTop: 3, maxWidth: isMobile ? "100%" : "500px", textAlign: "left" ,color: "#222222"}}>
                             Welcome to empolyer, your gateway to finding the perfect job or the ideal candidate. Our platform connects employers and employees with a user-friendly interface designed to streamline the job search and application process.
                         </Typography>
 
@@ -66,7 +66,7 @@ function HomePage() {
 
 
 
-            <Box sx={{ display: "flex", width: "100vw", height: "100%", padding: isMobile ? "20px" : "80px", boxSizing: "border-box" }} >
+            {/* <Box sx={{ display: "flex", width: "100vw", height: "100%", padding: isMobile ? "20px" : "80px", boxSizing: "border-box" }} >
 
                 <Box sx={{ display: "flex", flexDirection: "column", width: "100%", boxSizing: "border-box" }} >
                     <Typography variant='h2' sx={{ fontWeight: 600, textAlign: isMobile ? "center" : "left" }} >
@@ -95,7 +95,7 @@ function HomePage() {
 
 
 
-            </Box>
+            </Box> */}
 
         </div>
     )

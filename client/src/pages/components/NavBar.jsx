@@ -49,32 +49,38 @@ export default function NavBar() {
     };
 
     const drawerContent = (
-        <List>
+        <List sx={{ color: 'white' }}>
             {(loggedIn && role !== "admin") ? (
-                <ListItem><ListItemText primary={email} /></ListItem>
+                <ListItem sx={{ color: 'white' }}>
+                    <Typography  variant='body1' sx={{ color: "white" }}>{email}</Typography>
+                </ListItem>
             ) : (
-                <ListItem><ListItemText primary={"Admin"} /></ListItem>
+                <ListItem>
+                    <Typography sx={{ color: "white" }}>Admin</Typography>
+                </ListItem>
             )}
-
+    
             {commonRoutes.map(({ label, path }) => (
                 <ListItem button key={label} onClick={() => navigate(path)}>
-                    <ListItemText primary={label} />
+                    <Typography sx={{ color: "white" }}>{label}</Typography>
                 </ListItem>
             ))}
-
+    
             {loggedIn && roleBasedRoutes[role]?.map(({ label, path }) => (
                 <ListItem button key={label} onClick={() => navigate(path)}>
-                    <ListItemText primary={label} />
+                    <Typography sx={{ color: "white" }}>{label}</Typography>
                 </ListItem>
             ))}
-
+    
             {loggedIn && (
                 <ListItem button onClick={handleLogOut}>
-                    <ListItemText primary="Log Out" />
+                    <Typography sx={{ color: "white" }}>Log Out</Typography>
                 </ListItem>
             )}
         </List>
     );
+
+    
 
     return (
         <AppBar position="static" sx={{ zIndex: 2 }}>
@@ -114,7 +120,7 @@ export default function NavBar() {
                     sx={{
                         '& .MuiDrawer-paper': {
                             backgroundColor: theme.palette.primary.main,
-                            color: theme.palette.primary.contrastText,
+                            color: "white",
                             width: 240, // Fixed width for the drawer
                         }
                     }}

@@ -12,7 +12,7 @@ function DashboardSideMenu() {
 
     return (
         <Box className="dashboard-side-menu" sx={{ color: 'white', width: "200px" }}>
-            <Typography sx={{ padding: '19px 0', fontSize: '20px' }}>
+            <Typography sx={{ padding: '19px 0', fontSize: '20px', color: 'white' }}>
                 Dashboard
             </Typography>
 
@@ -20,12 +20,15 @@ function DashboardSideMenu() {
 
                 {dashboardRoutes.map((item, index) => (
                     <ListItem key={index} button component={Link} to={item.path}>
-                        <ListItemText primary={item.label} />
+                        <Typography variant="body1" sx={{ color: 'white' }}>
+                            {item.label}
+                        </Typography>
                     </ListItem>
                 ))}
                 
             </List>
         </Box>
+        
     );
 }
 
