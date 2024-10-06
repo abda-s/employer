@@ -1,31 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import axios from 'axios';
-import { serverURL } from '../../constants';
+import React, { useState } from 'react';
+import { useAxios } from '../../hooks/useAxios';
 import JobApplyModal from './JobApplyModal';
 import JobListingItem from './JobListingItem'; // Import the new card component
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
-
+import { CircularProgress } from '@mui/material';
 
 function JobListingView() {
-    const [data, setData] = useState([]);
-    const accessToken = useSelector(state => state.auth.token);
+    const { response: jobs, error, isLoading } = useAxios({ url: '/job-posting/job-listing', method: 'GET'});
 
     const [isVisible, setIsVisible] = useState(false);
     const [index, setIndex] = useState(null);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const url = `${serverURL}/job-posting/job-listing`;
-                const response = await axios.get(url, { headers: { accessToken } });
-                setData(response.data);
-            } catch (error) {
-                console.error("Error fetching job postings:", error);
-            }
-        };
-        fetchData();
-    }, [isVisible]);
+    if (isLoading) return (
+        <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', width: '100vw'}}>
+            <CircularProgress />
+        </div>
+    );
+    if (error) return <div>Error: {error.message}</div>
 
     return (
 
@@ -33,7 +24,7 @@ function JobListingView() {
             <ResponsiveMasonry
                 columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 3 }}>
                 <Masonry >
-                    {data?.map((item, i) => (
+                    {jobs?.map((item, i) => (
                         <JobListingItem
                             key={index}
                             item={item}
@@ -48,14 +39,14 @@ function JobListingView() {
             </ResponsiveMasonry>
 
 
-
             <JobApplyModal
                 isVisible={isVisible}
                 onClose={() => setIsVisible(false)}
-                id={data?.[index]?._id}
+                id={jobs?.[index]?._id}
             />
         </div>
     );
 }
 
 export default JobListingView;
+
