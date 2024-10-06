@@ -1,46 +1,56 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
-
 import { serverURL } from '../constants';
 
 axios.defaults.baseURL = serverURL;
 
-export const useAxios = ({ url, method, body = null, headers: customHeaders = null }) => {
+export const useAxios = ({ url, method, manual = false }) => {
     const accessToken = useSelector(state => state.auth.token);
 
     const [response, setResponse] = useState(null);
     const [error, setError] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
 
-    const fetchData = async () => {
+    // Store the request function so it can be called manually
+    const fetchData = useCallback(async (params = {}) => {
         setIsLoading(true);
-        let headers = { ...customHeaders };
+        let headers
 
         if (accessToken) {
-            headers['accessToken'] = accessToken; // Changed to 'Authorization' for better practice
+            headers['accessToken'] = accessToken;
         }
 
         try {
             const res = await axios({
                 method,
                 url,
-                data: method === 'POST' || method === 'PUT' ? body : undefined, // Avoid sending body for GET requests
+                data: (method === 'POST' || method === 'PUT') ? params.body : undefined,
                 headers,
             });
+
             setResponse(res.data);
+
+            return res.data; // Return the response data
+
+
         } catch (err) {
-            console.error('Error fetching data:', err); // Log the error for debugging
-            setError(err.response ? err.response.data : 'An error occurred'); // Capture response error
+            console.error('Error fetching data:', err); // Log error for debugging
+            const errorMessage = err.response ? err.response.data : 'An error occurred';
+            setError(errorMessage); // Capture error message
+
+            return { error: errorMessage }; // Return the error
+
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [accessToken, method, url]);
 
     useEffect(() => {
-        fetchData();
-    }, [method, url, body, customHeaders, accessToken]); // Added customHeaders and accessToken to dependencies
+        if (!manual) {
+            fetchData(); // Automatically fetch data unless manual trigger is required
+        }
+    }, [fetchData, manual]);
 
-    return { response, error, isLoading };
+    return { response, error, isLoading, fetchData }; // Return fetchData to trigger request manually
 };
-
