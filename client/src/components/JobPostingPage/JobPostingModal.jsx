@@ -1,14 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { TextField, FormControl, Button, Modal, Box, Autocomplete } from '@mui/material';
+import React from 'react';
+import { TextField, FormControl, Button, Modal, Box } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import axios from 'axios';
-import { serverURL } from '../../constants';
-import { useSelector } from 'react-redux';
 import SkillsMultiSelectField from '../SkillsMultiSelectField';
+import { useAxios } from '../../hooks/useAxios';
 
 const validationSchema = Yup.object({
     jobTitle: Yup.string().required('Job Title is required'),
@@ -20,25 +18,30 @@ const validationSchema = Yup.object({
 });
 
 function JobPostingModal({ isVisible, setIsVisible, setToRefresh }) {
-    const accessToken = useSelector(state => state.auth.token)
 
-    const handleSubmitReq = (jobTitle, companyName, location, description, requirements, applicationDeadline) => {
-        axios.post(`${serverURL}/job-posting/add-job`, {
-            jobTitle,
-            companyName,
-            location,
-            description,
-            requirements,
-            applicationDeadline,
-            skills: requirements,
-        }, { headers: { accessToken } })
-            .then(response => {
+    const { fetchData } = useAxios({
+        url: "/job-posting/add-job",
+        method: "POST",
+        manual: true
+    })
+
+    const handleSubmitReq = async (values) => {
+        try {
+            const result = await fetchData({
+                body: {
+                    ...values,
+                    skills: values.requirements
+                }
+            })
+
+            if (result && !result.error) {
                 setIsVisible(false)
-                setToRefresh(response)
-            })
-            .catch(err => {
-                console.log(err)
-            })
+                setToRefresh(result)
+            }
+
+        } catch (err) {
+            console.log(err)
+        }
     }
 
     return (
@@ -53,8 +56,7 @@ function JobPostingModal({ isVisible, setIsVisible, setToRefresh }) {
                     validationSchema={validationSchema}
                     onSubmit={(values) => {
                         console.log("values", values);
-
-                        handleSubmitReq(values.jobTitle, values.companyName, values.location, values.description, values.requirements, values.applicationDeadline)
+                        handleSubmitReq(values)
                     }}
                 >
                     {({ values, handleChange, handleBlur, handleSubmit, errors, touched, setFieldValue }) => (
@@ -91,7 +93,7 @@ function JobPostingModal({ isVisible, setIsVisible, setToRefresh }) {
                                 <SkillsMultiSelectField
                                     name="requirements"
                                     label="Add requirements"
-                                    setFieldValue={(fieldName, value) => setFieldValue(fieldName, value)}  // Correct the function here
+                                    setFieldValue={(fieldName, value) => setFieldValue(fieldName, value)}
                                     errors={errors}
                                     touched={touched}
                                 />
@@ -140,18 +142,19 @@ function JobPostingModal({ isVisible, setIsVisible, setToRefresh }) {
                                 error={Boolean(errors.description && touched.description)}
                                 helperText={touched.description && errors.description ? errors.description : ''}
                             />
-                            <div style={{ display: "flex", width: "100%", alignItems: "center", justifyContent: "center", marginTop: "20px" }}>
-                                <div style={{ flex: 1, marginRight: "10px" }}>
+
+                            <Box display="flex" width="100%" alignItems="center" justifyContent="center" mt={2}>
+                                <Box flex={1} mr={2}>
                                     <Button variant="outlined" onClick={() => setIsVisible(false)} fullWidth>
                                         Cancel
                                     </Button>
-                                </div>
-                                <div style={{ flex: 1 }}>
+                                </Box>
+                                <Box flex={1}>
                                     <Button variant="contained" type="submit" fullWidth>
                                         Add
                                     </Button>
-                                </div>
-                            </div>
+                                </Box>
+                            </Box>
                         </Form>
                     )}
                 </Formik>
