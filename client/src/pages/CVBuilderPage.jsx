@@ -6,8 +6,8 @@ import { initCV } from '../redux'
 
 import '../styles/CVBuilderPage.css'
 import NavBar from "../components/NavBar"
-import SideBarBuilder from "../components/CVBuilder/SideBarBuilder"
-import CVCanvas from "../components/CVBuilder/CVCanvas"
+import SideBarBuilder from "../components/cvBuilder/SideBarBuilder"
+import CVCanvas from "../components/cvBuilder/CVCanvas"
 import { serverURL } from '../constants'
 
 function CVBuilderPage() {

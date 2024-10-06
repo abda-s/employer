@@ -7,9 +7,9 @@ import axios from 'axios';
 import { serverURL } from '../constants';
 import "../styles/JobPostingPage.css"
 
-import ApplicationView from '../components/JobPostingPage/application/ApplicationView';
-import JobPostingsView from '../components/JobPostingPage/JobPostingsView';
-import JobPostingModal from '../components/JobPostingPage/JobPostingModal';
+import ApplicationView from '../components/jobPostingPage/application/ApplicationView';
+import JobPostingsView from '../components/jobPostingPage/JobPostingsView';
+import JobPostingModal from '../components/jobPostingPage/JobPostingModal';
 
 function JobPostingPage() {
     const [isVisible, setIsVisible] = useState(false);

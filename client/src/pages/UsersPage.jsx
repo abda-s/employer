@@ -1,6 +1,6 @@
 import React from 'react'
 import DashboardLayout from '../components/DashboardLayout'
-import UsersTable from '../components/AdminDashboard/UsersTable'
+import UsersTable from '../components/adminDashboard/UsersTable'
 
 function UsersPage() {
   return (

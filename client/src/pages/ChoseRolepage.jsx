@@ -1,7 +1,7 @@
 import React from 'react'
 import NavBar from '../components/NavBar'
 import ChoseSvg from "../assetes/Businesswoman-receives-congratulation.svg"
-import ChooseForm from '../components/Choose/ChooseForm'
+import ChooseForm from '../components/chooseRole/ChooseForm'
 import '../styles/ChoseRolepage.css'
 function ChoseRolepage() {
     return (

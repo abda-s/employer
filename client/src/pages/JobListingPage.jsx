@@ -1,6 +1,6 @@
 import React from 'react'
 import NavBar from '../components/NavBar'
-import JobListingView from '../components/JobListing/JobListingView'
+import JobListingView from '../components/jobListing/JobListingView'
 import '../styles/JobListingPage.css'
 
 function JobListingPage() {

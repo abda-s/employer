@@ -6,7 +6,7 @@ import { useReactToPrint } from 'react-to-print';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 
-import CVCanvas from '../../CVBuilder/CVCanvas';
+import CVCanvas from '../../cvBuilder/CVCanvas';
 import { serverURL } from '../../../constants';
 
 function ApplicationDetails({ item, status, setStatus, data, setData, cv }) {
