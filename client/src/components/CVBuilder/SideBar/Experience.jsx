@@ -8,13 +8,12 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import axios from 'axios';
 import moment from 'moment';
 import dayjs from "dayjs"
 
 
-import { serverURL } from '../../../constants';
 import { addExperience, deleteExperience, editExperience } from '../../../redux';
+import { useAxios } from '../../../hooks/useAxios';
 
 const validationSchema = Yup.object({
     jobTitle: Yup.string().required('Job Title is required'),
@@ -38,35 +37,62 @@ function Experience() {
     const [indexOfItem, setIndexOfItem] = useState(null)
 
 
-    const submitEdit = (jobTitle, companyName, description, startDate, endDate) => {
-        axios.put(`${serverURL}/cv/edit-experience`, { experienceIndex: indexOfItem, jobTitle, companyName, description, startDate, endDate }, { headers: { accessToken: token } })
-            .then((result) => {
-                setIsEditMode(false)
-                setIndexOfItem(null)
-                dispatch(editExperience(indexOfItem, jobTitle, companyName, description, startDate, endDate))
+    const { fetchData: editExperienceData } = useAxios({
+        url: `/cv/edit-experience`,
+        method: 'PUT',
+        manual: true,
+    });
 
-            })
-            .catch((err) => { console.log(err.message) })
-    }
+    // useAxios hook for adding experience
+    const { fetchData: addExperienceData } = useAxios({
+        url: `/cv/add-experience`,
+        method: 'PUT',
+        manual: true,
+    });
 
-    const submitAdd = (jobTitle, companyName, description, startDate, endDate) => {
-        axios.put(`${serverURL}/cv/add-experience`, { jobTitle, companyName, description, startDate, endDate }, { headers: { accessToken: token } })
-            .then((result) => {
-                setIsEditMode(false)
-                dispatch(addExperience(jobTitle, companyName, description, startDate, endDate))
-            })
-            .catch((err) => { console.log(err.message) })
-    }
+    // useAxios hook for deleting experience
+    const { fetchData: deleteExperienceData } = useAxios({
+        url: `/cv/experience/${indexOfItem}`,
+        method: 'DELETE',
+        manual: true,
+    });
 
-    const deleteItem = index => {
-        axios.delete(`${serverURL}/cv/experience/${index}`, { headers: { accessToken: token } })
-            .then((result) => {
+    const submitEdit = async (values) => {
+        const params = { ...values, experienceIndex: indexOfItem };
+        const result = await editExperienceData({ body: params });
 
-                setIsEditMode(false)
-                dispatch(deleteExperience(index))
-            })
-            .catch((err) => { console.log(err.message) })
-    }
+        if (!result.error) {
+            setIsEditMode(false);
+            setIndexOfItem(null);
+            const { jobTitle, companyName, description, startDate, endDate } = values
+            dispatch(editExperience(indexOfItem, jobTitle, companyName, description, startDate, endDate));
+        } else {
+            console.log(result.error);
+        }
+    };
+
+
+    const submitAdd = async (values) => {
+        const result = await addExperienceData({ body: values });
+        if (!result.error) {
+            setIsEditMode(false);
+            const { jobTitle, companyName, description, startDate, endDate } = values
+            dispatch(addExperience(jobTitle, companyName, description, startDate, endDate));
+        } else {
+            console.log(result.error);
+        }
+    };
+
+
+    const deleteItem = async () => {        
+        const result = await deleteExperienceData();
+        if (!result.error) {
+          setIsEditMode(false);
+          dispatch(deleteExperience(indexOfItem));
+        } else {
+          console.log(result.error);
+        }
+      };
 
 
 
@@ -94,7 +120,7 @@ function Experience() {
                 Experience
             </AccordionSummary>
             <AccordionDetails
-            sx={{mp:2}}
+                sx={{ mp: 2 }}
             >
                 <div style={{ width: "100%", display: "flex", flexDirection: "column" }} >
                     {data?.experience?.map((item, index) => {
@@ -167,17 +193,14 @@ function Experience() {
                     }
                 }
                 onSubmit={values => {
-                    console.log("wow")
-                    const item = values
-                    console.log("wow")
                     if (indexOfItem !== null) {
-                        submitEdit(item.jobTitle, item.companyName, item.description, item.startDate, item.endDate)
+                        submitEdit(values)
                     } else {
-                        submitAdd(item.jobTitle, item.companyName, item.description, item.startDate, item.endDate)
+                        submitAdd(values)
                     }
                 }}
             >
-                {({ values, handleChange, handleBlur, handleSubmit, errors, touched, isValid }) => (
+                {({ values, handleChange, handleBlur, handleSubmit, errors, touched}) => (
                     <Form
                         onSubmit={handleSubmit}
                         style={{ width: "100%" }}
@@ -275,7 +298,7 @@ function Experience() {
 
                             {(indexOfItem !== 0 && indexOfItem !== null) && (
                                 <div style={{ display: "flex", flex: 1, justifyContent: "center" }}>
-                                    <IconButton onClick={() => { deleteItem(indexOfItem); setIndexOfItem(null); }}><DeleteIcon sx={{ fontSize: "30px" }} /></IconButton>
+                                    <IconButton onClick={() => { deleteItem(); setIndexOfItem(null); }}><DeleteIcon sx={{ fontSize: "30px" }} /></IconButton>
                                 </div>
                             )}
                             <div style={{ flex: 1, marginRight: "10px" }} >
