@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Divider, Accordion, AccordionDetails, AccordionSummary, Button, Typography, TextField, IconButton, Box, FormControl, Autocomplete } from '@mui/material';
+import { Divider, Accordion, AccordionDetails, AccordionSummary, Button, Typography, TextField, IconButton, Box} from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
-import axios from 'axios';
-import { serverURL } from '../../../constants';
 import { addSkill, deleteSkill, editSkill } from '../../../redux';
+import SelectSkillsField from '../../SelectSkillsField';
+import { useAxios } from '../../../hooks/useAxios';
 
 const validationSchema = Yup.object({
     skillId: Yup.object({
@@ -25,63 +25,61 @@ function Skills() {
     const dispatch = useDispatch();
     const [isEditMode, setIsEditMode] = useState(false);
     const [indexOfItem, setIndexOfItem] = useState(null);
-    const accessToken = useSelector(state => state.auth.token);
 
-    const [options, setOptions] = useState([]);
-    const [inputValue, setInputValue] = useState('');
+// Use Axios hook for adding a skill
+const { fetchData: addSkillData } = useAxios({
+    url: '/cv/add-skill',
+    method: 'PUT',
+    manual: true,
+});
 
-    useEffect(() => {
-        getSkills();
-    }, []);
+// Use Axios hook for editing a skill
+const { fetchData: editSkillData } = useAxios({
+    url: '/cv/edit-skill',
+    method: 'PUT',
+    manual: true,
+});
 
-    const getSkills = () => {
-        axios.get(`${serverURL}/skills/all-skills/`, { headers: { accessToken } })
-            .then(response => {
-                const skillList = response?.data?.map((item, index) => ({
-                    ...item,
-                    id: index, // Assuming you want sequential IDs starting from 1
-                    label: item?.name,
-                }));
-                setOptions(skillList);
-            })
-            .catch(err => {
-                console.log("Error fetching skills: ", err);
-            });
-    };
+// Use Axios hook for deleting a skill
+const { fetchData: deleteSkillData } = useAxios({
+    url: `/cv/skill/${indexOfItem}`,
+    method: 'DELETE',
+    manual: true,
+});
 
-    const submitAdd = (skillId, level) => {
-        axios.put(`${serverURL}/cv/add-skill`, { skillId, level }, { headers: { accessToken } })
-            .then(() => {
-                setIsEditMode(false);
-                setIndexOfItem(null);
-                dispatch(addSkill(skillId, level));
-            })
-            .catch(err => { console.log(err.message); });
-    };
+const submitAdd = async (skillId, level) => {
+    const result = await addSkillData({ body: { skillId, level } });
+    if (!result.error) {
+        setIsEditMode(false);
+        setIndexOfItem(null);
+        dispatch(addSkill(skillId, level));
+    } else {
+        console.log(result.error);
+    }
+};
 
-    const deleteItem = index => {
-        axios.delete(`${serverURL}/cv/skill/${index}`, { headers: { accessToken } })
-            .then(() => {
-                setIndexOfItem(null);
-                setIsEditMode(false);
-                dispatch(deleteSkill(index));
-            })
-            .catch(err => { console.log(err.message); });
-    };
+const deleteItem = async (index) => {
+    const result = await deleteSkillData();
+    if (!result.error) {
+        setIndexOfItem(null);
+        setIsEditMode(false);
+        dispatch(deleteSkill(index));
+    } else {
+        console.log(result.error);
+    }
+};
 
-    const submitEdit = values => {
-        const { level } = values;
-        axios.put(`${serverURL}/cv/edit-skill`, { level, skillsIndex: indexOfItem }, { headers: { accessToken } })
-            .then(() => {
-                setIsEditMode(false);
-                setIndexOfItem(null);
-                dispatch(editSkill(indexOfItem, level));
-
-            })
-            .catch(err => {
-                console.log(err);
-            });
-    };
+const submitEdit = async (values) => {
+    const { level } = values;
+    const result = await editSkillData({ body: { level, skillsIndex: indexOfItem } });
+    if (!result.error) {
+        setIsEditMode(false);
+        setIndexOfItem(null);
+        dispatch(editSkill(indexOfItem, level));
+    } else {
+        console.log(result.error);
+    }
+};
 
     return !isEditMode ? (
         <Accordion
@@ -163,54 +161,23 @@ function Skills() {
                     <Form onSubmit={handleSubmit} style={{ width: "100%" }}
                     >
                         <div style={{ marginBottom: "20px", width: "100%" }}>
-                            <div style={{ display: "flex", alignItems: "flex-start", marginBottom: "10px", width: "100%"}}>
+                            <div style={{ display: "flex", alignItems: "flex-start", marginBottom: "10px", width: "100%" }}>
                                 {indexOfItem !== null ? (
-                                    <Box sx={{ display: "flex", flex: 1 ,alignItems: "center", justifyContent: "center",mt:1 }} >
-                                        <Box sx={{fontSize:"18px"}} >
+                                    <Box sx={{ display: "flex", flex: 1, alignItems: "center", justifyContent: "center", mt: 1 }} >
+                                        <Box sx={{ fontSize: "18px" }} >
                                             {values.skillId.name}
 
                                         </Box>
                                     </Box>
                                 ) : (
-                                    <FormControl sx={{ flex: 1, mr: 1 }}>
-                                        <Autocomplete
-                                            options={options}
-                                            value={options.find(option => option._id === values.skillId?._id) || null}
-                                            freeSolo
-                                            onChange={(event, newValue) => {
-                                                // Set newValue if it's a string or an object
-                                                if (typeof newValue === 'string') {
-                                                    setFieldValue('skillId', { name: newValue, _id: null });
-                                                } else if (newValue && typeof newValue === 'object') {
-                                                    setFieldValue('skillId', newValue);
-                                                } else {
-                                                    setFieldValue('skillId', null);
-                                                }
-                                            }}
-                                            getOptionLabel={(option) => typeof option === 'string' ? option : option.name || ''}
-                                            filterOptions={(options, { inputValue }) => {
-                                                const filteredOptions = options.filter(option =>
-                                                    option.name.toLowerCase().includes(inputValue.toLowerCase())
-                                                );
-                                                if (inputValue && !filteredOptions.some(option => option.name === inputValue)) {
-                                                    filteredOptions.push({
-                                                        _id: null,
-                                                        name: inputValue
-                                                    });
-                                                }
-                                                return filteredOptions;
-                                            }}
-                                            renderInput={(params) => (
-                                                <TextField
-                                                    {...params}
-                                                    variant="outlined"
-                                                    label="Skill"
-                                                    error={Boolean(errors.skillId && touched.skillId)}
-                                                    helperText={touched.skillId && errors.skillId ? errors.skillId : ''}
-                                                />
-                                            )}
-                                        />
-                                    </FormControl>
+                                    <SelectSkillsField
+                                        name='skillId'
+                                        label='Select skill'
+                                        values={values}
+                                        setFieldValue={(fieldName, values) => setFieldValue(fieldName, values)}
+                                        errors={errors}
+                                        touched={touched}
+                                    />
                                 )}
 
 
