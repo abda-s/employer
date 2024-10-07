@@ -2,7 +2,7 @@ import { Modal } from '@mui/material'
 import React from 'react'
 import ApplicationDetails from './ApplicationDetails'
 
-function ApplicationModel({ isVisible, setIsVisible, item, cv, selectedItemIndex, status, setStatus, data, setData }) {
+function ApplicationModel({ isVisible, setIsVisible, item, cv, selectedItemIndex, status, setStatus, data, setToRefreshApplications }) {
     return (
         <Modal
             open={isVisible}
@@ -16,9 +16,10 @@ function ApplicationModel({ isVisible, setIsVisible, item, cv, selectedItemIndex
                 setStatus={e => setStatus(e)}
 
                 data={data}
-                setData={e => setData(e)}
 
                 cv={cv}
+
+                setToRefreshApplications={e => setToRefreshApplications(e)}
             />
         </Modal>
     )

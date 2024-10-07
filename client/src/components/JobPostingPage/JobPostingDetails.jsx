@@ -4,7 +4,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import moment from 'moment';
 import JobEditModal from './JobEditModal';
 
-const JobPostingDetails = ({ data, setIsEditVisibile, setToRefresh, isEditVisibile }) => {
+const JobPostingDetails = ({ data, setIsEditVisibile, setToRefreshApplications, isEditVisibile }) => {
 
     useEffect(() => {
         const container = document.querySelector('.requirements-container');
@@ -79,7 +79,7 @@ const JobPostingDetails = ({ data, setIsEditVisibile, setToRefresh, isEditVisibi
                 jobData={data}
                 isVisible={isEditVisibile}
                 onClose={() => setIsEditVisibile(false)}
-                setToRefresh={e => setToRefresh(e)}
+                setToRefreshApplications={e => setToRefreshApplications(e)}
             />
         </Box>
     );

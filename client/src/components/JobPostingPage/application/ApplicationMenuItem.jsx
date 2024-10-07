@@ -1,17 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import moment from 'moment'
 import ApplicationModel from './ApplicationModel';
 
-function ApplicationMenuItem({ index, item, data, setData,setSortMenuItems }) {
+function ApplicationMenuItem({ index, item, data,setToRefreshApplications }) {
     const [isVisible, setIsVisible] = useState(false)
-    const [status, setStatus] = useState(item?.status || " Pending")
 
-    useEffect(() => {
-        setStatus(data.applications[index].status)
-        
-        setSortMenuItems([...new Set(data?.applications?.map(val => val.status))])
-
-    }, [data,isVisible])
 
     return (
         <>
@@ -28,7 +21,7 @@ function ApplicationMenuItem({ index, item, data, setData,setSortMenuItems }) {
                     >{item?.employeeId?.fullName}</span>
                     <span
                         style={{ fontSize: "12px", padding: "5px", background: "#fff2e0", color: "#f25c05", borderRadius: "10px", border: "solid 1px #f25c05" }}
-                    >{status}
+                    >{item?.status}
                     </span>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }} >
@@ -38,7 +31,7 @@ function ApplicationMenuItem({ index, item, data, setData,setSortMenuItems }) {
                         {item?.employeeId?.phoneNumber}
                     </span>
                     <span style={{ color: "GrayText" }} >
-                        {moment(item.applicationDate).format("YYYY/MM/DD")}
+                        {moment(item?.applicationDate).format("YYYY/MM/DD")}
                     </span>
                 </div>
             </div>
@@ -48,12 +41,9 @@ function ApplicationMenuItem({ index, item, data, setData,setSortMenuItems }) {
 
                 item={item}
                 cv={item?.employeeId}
-
-                status={status}
-                setStatus={e => setStatus(e)}
-
+                status={item?.status}
                 data={data}
-                setData={e => setData(e)}
+                setToRefreshApplications={e => setToRefreshApplications(e)}
             />
         </>
     )

@@ -14,7 +14,7 @@ const validationSchema = Yup.object({
     location: Yup.string().required('Location is required'),
     description: Yup.string().required('Description is required'),
 
-    requirements: Yup.array().min(1, 'At least one requirement is required'),
+    skills: Yup.array().min(1, 'At least one requirement is required'),
 });
 
 function JobPostingModal({ isVisible, setIsVisible, setToRefresh }) {
@@ -27,12 +27,7 @@ function JobPostingModal({ isVisible, setIsVisible, setToRefresh }) {
 
     const handleSubmitReq = async (values) => {
         try {
-            const result = await fetchData({
-                body: {
-                    ...values,
-                    skills: values.requirements
-                }
-            })
+            const result = await fetchData({ body: values })
 
             if (result && !result.error) {
                 setIsVisible(false)
@@ -52,7 +47,7 @@ function JobPostingModal({ isVisible, setIsVisible, setToRefresh }) {
         >
             <Box component="section" sx={{ p: 2, backgroundColor: "white", borderRadius: 3, boxSizing: "border-box", margin: "auto", display: "flex", flexDirection: "column", justifyContent: "center", width: { xs: "100%", sm: "100%", lg: "550px", xl: "550px" } }}>
                 <Formik
-                    initialValues={{ jobTitle: '', companyName: '', location: '', description: '', requirements: [], applicationDeadline: null }}
+                    initialValues={{ jobTitle: '', companyName: '', location: '', description: '', skills: [], applicationDeadline: null }}
                     validationSchema={validationSchema}
                     onSubmit={(values) => {
                         console.log("values", values);
@@ -91,8 +86,9 @@ function JobPostingModal({ isVisible, setIsVisible, setToRefresh }) {
                                 />
 
                                 <SkillsMultiSelectField
-                                    name="requirements"
-                                    label="Add requirements"
+                                    name="skills"
+                                    label="Add skills"
+                                    values={values}
                                     setFieldValue={(fieldName, value) => setFieldValue(fieldName, value)}
                                     errors={errors}
                                     touched={touched}

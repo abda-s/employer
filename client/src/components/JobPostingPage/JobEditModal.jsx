@@ -5,10 +5,9 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import axios from 'axios';
-import { serverURL } from '../../constants';
-import { useSelector } from 'react-redux';
 import dayjs from 'dayjs';
+import SkillsMultiSelectField from '../SkillsMultiSelectField';
+import { useAxios } from '../../hooks/useAxios';
 
 const validationSchema = Yup.object({
     jobTitle: Yup.string().required('Job Title is required'),
@@ -18,70 +17,49 @@ const validationSchema = Yup.object({
     skills: Yup.array().min(1, 'At least one skill is required'),
 });
 
-function JobEditModal({ jobData, isVisible, onClose, onSave, setToRefresh }) {
-    const [options, setOptions] = useState([]);
-    const [inputValue, setInputValue] = useState('');
-    const [initalSkills,setInitalSkills] = useState([])
+function JobEditModal({ jobData, isVisible, onClose, onSave, setToRefreshApplications }) {
+    const [initalSkills, setInitalSkills] = useState([])
 
-    const accessToken = useSelector(state => state.auth.token);
 
     useEffect(() => {
-        getSkills();
         const skillList = jobData?.skills?.map((item, index) => ({
             ...item,
             id: index, // Assuming you want sequential IDs starting from 1
             label: item.name,
         }));
         setInitalSkills(skillList)
-
     }, []);
 
-    const getSkills = () => {
-        axios.get(`${serverURL}/skills/all-skills/`, { headers: { accessToken } })
-            .then(response => {
-                const skillList = response?.data?.map((item, index) => ({
-                    ...item,
-                    id: index, // Assuming you want sequential IDs starting from 1
-                    label: item.name,
-                }));
-                setOptions(skillList);
-            })
-            .catch(err => {
-                console.log("Error fetching skills: ", err);
-            });
-    };
+    const { fetchData } = useAxios({
+        url: `/job-posting/edit-job`,
+        method: "PUT",
+        manual: true
+    })
 
-    const handleAddOption = (event) => {
-        if (event.key === 'Enter' && event.target.value) {
-            setOptions([...options, { _id: null, name: event.target.value }]);
-            event.target.value = '';
+    const handleSubmitSkills = async (values) => {
+        console.log("values", values);
+        
+        try {
+            const result = await fetchData({
+                body: {
+                    ...values,
+                    postId: jobData._id
+                }
+            })
+
+            if (result && !result.error) {
+                setToRefreshApplications(result)
+                onClose()
+            }
+
+        }
+        catch (err) {
+            console.log(err)
         }
     };
 
-    const handleSubmitSkills = (values) => {
-        axios.put(`${serverURL}/job-posting/edit-job`, {
-            jobTitle: values.jobTitle,
-            companyName: values.companyName,
-            location: values.location,
-            description: values.description,
-            skills: values.skills,
-            applicationDeadline: values.applicationDeadline,
-            status: values.status,
-            postId: jobData._id
-        }, { headers: { accessToken } })
-            .then(response => {
-                console.log(response.data);
-                
-                setToRefresh(response.data)
-                onClose();
-            })
-            .catch(err => {
-                console.log(err.message);
-            });
-    };
 
 
-    
     const initialValues = {
         jobTitle: jobData?.jobTitle || '',
         companyName: jobData?.companyName || '',
@@ -147,58 +125,14 @@ function JobEditModal({ jobData, isVisible, onClose, onSave, setToRefresh }) {
                                         helperText={touched.location && errors.location ? errors.location : ''}
                                     />
 
-                                    <FormControl sx={{ flex: 1 }}>
-                                        <Field
-                                            component={Autocomplete}
-                                            multiple
-                                            options={options}
-                                            value={values.skills}
-                                            freeSolo
-                                            name="skills"
-                                            sx={{ flex: 1 }}
-                                            inputValue={inputValue}
-                                            onInputChange={(event, newInputValue) => {
-                                                setInputValue(newInputValue); // Track input value for filtering
-                                            }}
-                                            onChange={(event, value) => {
-                                                // Handle freeSolo custom entries by checking if it's a string
-                                                const formattedValue = value.map((item) =>
-                                                    typeof item === 'string'
-                                                        ? { _id: null, name: item } // Create object with _id as null
-                                                        : item // Return existing object if it's already structured
-                                                );
-                                                setFieldValue('skills', formattedValue);
-                                            }}
-                                            getOptionLabel={(option) => typeof option === 'string' ? option : option.name} // Handle both freeSolo and existing options
-                                            filterOptions={(options, { inputValue }) => {
-                                                const filteredOptions = inputValue
-                                                    ? options.filter(option =>
-                                                        option.name && option.name.toLowerCase().includes(inputValue.toLowerCase())
-                                                    )
-                                                    : [];
-
-                                                // Add the input value as an object with _id: null if it's not already present
-                                                if (inputValue !== '' && !filteredOptions.some(option => option.name === inputValue)) {
-                                                    filteredOptions.push({
-                                                        _id: null,
-                                                        name: inputValue
-                                                    });
-                                                }
-
-                                                return filteredOptions;
-                                            }}
-                                            renderInput={(params) => (
-                                                <TextField
-                                                    {...params}
-                                                    variant="outlined"
-                                                    label="Add Skill"
-                                                    onKeyDown={handleAddOption} // Optional: handle keydown if needed
-                                                    error={Boolean(errors.skills && touched.skills)}
-                                                    helperText={touched.skills && errors.skills ? errors.skills : ''}
-                                                />
-                                            )}
-                                        />
-                                    </FormControl>
+                                    <SkillsMultiSelectField
+                                        name="skills"
+                                        label="Add Skill"
+                                        values={values}
+                                        setFieldValue={(fieldName, value) => setFieldValue(fieldName, value)}
+                                        errors={errors}
+                                        touched={touched}
+                                    />
 
                                 </div>
 
@@ -249,7 +183,7 @@ function JobEditModal({ jobData, isVisible, onClose, onSave, setToRefresh }) {
                                             value={values.status}
                                         >
                                             <MenuItem value="active">Active</MenuItem>
-                                            <MenuItem value="inactive">Inactive</MenuItem>
+                                            <MenuItem value="expired">Expired</MenuItem>
                                         </Field>
                                         <ErrorMessage name="status" component="span" style={{ color: 'red' }} />
                                     </FormControl>

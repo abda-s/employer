@@ -1,56 +1,36 @@
-import React, { useEffect, useState } from 'react';
-import { Select, MenuItem, InputLabel, FormControl, Button, IconButton } from '@mui/material';
-import axios from 'axios';
-import { useSelector } from 'react-redux';
+import React, {  useState } from 'react';
+import { Select, MenuItem, InputLabel, FormControl, Button, IconButton, useMediaQuery } from '@mui/material';
 import { useReactToPrint } from 'react-to-print';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 
 import CVCanvas from '../../cvBuilder/CVCanvas';
-import { serverURL } from '../../../constants';
+import { useAxios } from '../../../hooks/useAxios';
 
-function ApplicationDetails({ item, status, setStatus, data, setData, cv }) {
-    const token = useSelector(state => state.auth.token);
+function ApplicationDetails({ item, status, cv, setToRefreshApplications }) {
 
     const [isCV, setIsCV] = useState(false)
-    const [isMobile, setIsMobile] = useState(false);
+    const isMobile = useMediaQuery('(max-width:600px)');
 
-    const handleChange = (event) => {
+    const { fetchData } = useAxios({
+        url: `/application/change-status`,
+        method: "PUT",
+        manual: true,
+    })
+
+    const handleChange = async (event) => {
         const newStatus = event.target.value;
         // Make a request to the server when the status changes
-        axios.put(`${serverURL}/application/change-status`, { status: newStatus, applicationId: item._id }, { headers: { accessToken: token } })
-            .then(response => {
-                // console.log('Status updated:', response.data);
-
-                const applicationIndex = data.applications.findIndex(app => app._id === item._id)
-
-                const newApplication = data.applications[applicationIndex]
-                newApplication.status = newStatus
-
-                const newData = data
-                newData.applications[applicationIndex] = newApplication
-
-                setStatus(newStatus)
-                setData(newData)
-
-            })
-            .catch(error => {
-                console.error('Error updating status:', error);
-            });
+        try {
+            const result = await fetchData({ body: { status: newStatus, applicationId: item._id } })
+            if (result && !result.error) {
+                setToRefreshApplications(result)
+            }
+        }
+        catch (err) {
+            console.log(err)
+        }
     };
-
-    useEffect(() => {
-        const handleResize = () => {
-            setIsMobile(window.innerWidth <= 768); // Adjust the breakpoint as needed
-        };
-
-        handleResize(); // Check on initial load
-        window.addEventListener('resize', handleResize);
-
-        return () => {
-            window.removeEventListener('resize', handleResize);
-        };
-    }, []);
 
     const handlePrint = useReactToPrint({
         content: () => document.getElementById('cv-canvas'),
@@ -58,7 +38,7 @@ function ApplicationDetails({ item, status, setStatus, data, setData, cv }) {
     });
 
     return !isCV ? (
-        <div style={{ display: "flex", borderRadius: "10px", boxShadow: "2px 2px 2px 1px rgb(0 0 0 / 20%)", flexDirection: "column", background: "white", width: "500px", padding: "20px", alignSelf: "center" ,margin:"0 10px"}}>
+        <div style={{ display: "flex", borderRadius: "10px", boxShadow: "2px 2px 2px 1px rgb(0 0 0 / 20%)", flexDirection: "column", background: "white", width: "500px", padding: "20px", alignSelf: "center", margin: "0 10px" }}>
 
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-evenly", marginBottom: "20px" }}>
                 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: "10px", width: "100%", fontSize: "20px", background: "#fff2e0", borderRadius: "10px", color: "#f25c05" }}>
@@ -69,7 +49,7 @@ function ApplicationDetails({ item, status, setStatus, data, setData, cv }) {
             <div style={{ display: "flex", flexDirection: "column" }} >
                 <div style={{ display: "flex", width: "100%", flex: 1, alignItems: "center", justifyContent: "flex-start", marginBottom: "10px" }}>
                     <div style={{ display: "flex", textTransform: "capitalize", fontSize: "18px" }} >
-                        Name: {item.employeeId.fullName}
+                        Name: {item?.employeeId?.fullName}
                     </div>
                 </div>
 

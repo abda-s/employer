@@ -4,7 +4,7 @@ import { Field } from 'formik';
 import { useAxios } from '../hooks/useAxios';
 
 
-function SkillsMultiSelectField({ name, label, setFieldValue, errors, touched }) {
+function SkillsMultiSelectField({ name, label, setFieldValue, errors, touched,values }) {
     const [options, setOptions] = useState([]);
     const [inputValue, setInputValue] = useState('');
 
@@ -37,6 +37,7 @@ function SkillsMultiSelectField({ name, label, setFieldValue, errors, touched })
                 component={Autocomplete}
                 multiple
                 options={options}
+                value={values[name] || []}
                 freeSolo
                 name={name}
                 sx={{ flex: 1 }}
