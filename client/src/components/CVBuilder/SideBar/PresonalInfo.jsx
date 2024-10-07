@@ -8,9 +8,8 @@ import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
-import axios from 'axios';
-import { serverURL } from '../../../constants';
 import { editPrsonalInfo } from '../../../redux';
+import { useAxios } from '../../../hooks/useAxios';
 
 const validationSchema = Yup.object({
     fullName: Yup.string().required('Full name is required'),
@@ -22,26 +21,35 @@ const validationSchema = Yup.object({
 
 function PresonalInfo() {
     const email = useSelector(state => state.auth.email)
-    const token = useSelector(state => state.auth.token)
     const data = useSelector(state => state.cv)
     const [isEditMode, setIsEditMode] = useState(false)
 
     const dispatch = useDispatch()
 
+    const { fetchData: editPersonalData } = useAxios({
+        url: `/cv/edit-personal-data`,
+        method: 'PUT',
+        manual: true
+    })
+
+
     const submitEdit = (fullName, phoneNumber, professionalSummary) => {
-        axios.put(`${serverURL}/cv/edit-personal-data`, { fullName, phoneNumber, professionalSummary }, { headers: { accessToken: token } })
-            .then(() => {
+        try {
+            const result = editPersonalData({ body: { fullName, phoneNumber, professionalSummary } })
+            if (result && !result.error) {
                 setIsEditMode(false)
                 dispatch(editPrsonalInfo(fullName, phoneNumber, professionalSummary))
-            })
-            .catch((err) => { console.log(err.message) })
+            }
+        } catch (err) {
+            console.log(err)
+        }
     }
 
     return (
         <div className="sidbar-item-con personal-info-con" >
             {!isEditMode ? (<>
                 <div style={{ display: "flex", width: "100%", justifyContent: "space-between" }}>
-                    <Typography variant="h5" sx={{ marginBottom: "15px", textTransform: "capitalize",color:"#222222" }}>
+                    <Typography variant="h5" sx={{ marginBottom: "15px", textTransform: "capitalize", color: "#222222" }}>
                         {data.fullName}
                     </Typography>
 
