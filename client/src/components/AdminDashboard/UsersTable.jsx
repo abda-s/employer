@@ -1,17 +1,14 @@
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { serverURL } from '../../constants';
-import { useSelector } from 'react-redux';
 import { DataGrid } from '@mui/x-data-grid';
 import { Box, useMediaQuery, TextField, Button } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import ResetUserPassModel from './ResetUserPassModel';
+import { useAxios } from '../../hooks/useAxios';
 
 function UsersTable() {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-    const accessToken = useSelector(state => state.auth.token);
     const [usersData, setUsersData] = useState([]);
 
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
@@ -19,17 +16,21 @@ function UsersTable() {
     const [isVisible, setIsVisible] = useState(false)
     const [userId, setUserId] = useState(null)
 
+    const { response, error, isLoading } = useAxios({
+        url: `/users/all-users`,
+        method: 'GET',
+    })
+
     useEffect(() => {
-        axios.get(`${serverURL}/users/all-users`, { headers: { accessToken } })
-            .then(res => {
-                const usersList = res.data.map(item => ({ ...item, id: item._id }));
-                setUsersData(usersList);
-            })
-            .catch(err => {
-                setUsersData([]);
-                console.log(err);
-            });
-    }, []);
+        if (response && !response.error) {
+            const usersList = response.map(item => ({ ...item, id: item._id }));
+            setUsersData(usersList);
+        }
+        if (error || response?.error) {
+            setUsersData([]);
+            console.log(error || response?.error);
+        }
+    }, [response,error]);
 
     const columns = [
         {
@@ -93,14 +94,15 @@ function UsersTable() {
                     columns={columns}
                     disableColumnMenu
                     autoHeight
+                    loading={isLoading}
                     disableColumnResize={!isMobile} // Disable resizing if !isMobile
                 />
             </Box>
 
-            <ResetUserPassModel 
-            isVisible={isVisible}
-            userId={userId}
-            onClose={()=>{setIsVisible(false); setUserId(null) }}
+            <ResetUserPassModel
+                isVisible={isVisible}
+                userId={userId}
+                onClose={() => { setIsVisible(false); setUserId(null) }}
 
             />
         </Box>

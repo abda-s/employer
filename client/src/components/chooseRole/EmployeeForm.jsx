@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { TextField, FormControl, Autocomplete, Button, IconButton } from '@mui/material';
+import React from 'react';
+import { TextField, FormControl,Button, IconButton } from '@mui/material';
 
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -7,14 +7,14 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Formik, Form, Field, FieldArray, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import InputMask from 'react-input-mask';
-import axios from 'axios';
-import { serverURL } from '../../constants';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch} from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { changeRole, editToken } from '../../redux';
 
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
+import SkillsMultiSelectField from '../SkillsMultiSelectField';
+import { useAxios } from '../../hooks/useAxios';
 
 
 const validationSchema = Yup.object({
@@ -52,39 +52,18 @@ const validationSchema = Yup.object({
 
 
 function EmployeeForm() {
-  const [options, setOptions] = useState([]);
-  const [inputValue, setInputValue] = useState('');
-
-  const accessToken = useSelector(state => state.auth.token);
-
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
-  useEffect(() => {
-    getSkills();
-  }, []);
-
-  const getSkills = () => {
-    axios.get(`${serverURL}/skills/all-skills/`, { headers: { accessToken } })
-      .then(response => {
-        const skillList = response?.data?.map((item, index) => ({
-          ...item,
-          id: index, // Assuming you want sequential IDs starting from 1
-          label: item.name,
-        }));
-        setOptions(skillList);
-      })
-      .catch(err => {
-        console.log("Error fetching skills: ", err);
-      });
-  };
-
-  const submitEmployee = (values) => {
+  const { fetchData: submitEmployeeData } = useAxios({
+    url: `/auth/employee`,
+    method: 'POST',
+    manual: true
+  })
+  const submitEmployee = async (values) => {
     const { firstName, lastName, phone, professionalSummary, skills, experience, education } = values;
 
-    const skillsArray = []
-
-    const theData = {
+    const employeeData = {
       fullName: `${firstName} ${lastName}`,
       phoneNumber: phone,
       professionalSummary,
@@ -93,23 +72,19 @@ function EmployeeForm() {
       education
     }
 
-    axios.post(`${serverURL}/auth/employee`, theData, { headers: { accessToken } }).
-      then(response => {
-        dispatch(editToken(response.data.token))
+    try {
+      const result = await submitEmployeeData({ body: employeeData });
+
+      if (result && !result.error) {
+        dispatch(editToken(result.token))
         dispatch(changeRole("employee"))
         navigate('/')
-      })
-      .catch(err => {
-        console.log("error", err.message)
-      })
-  }
+      }
 
-  const handleAddOption = (event) => {
-    if (event.key === 'Enter' && event.target.value) {
-      setOptions([...options, { _id: null, name: event.target.value }]);
-      event.target.value = '';
+    } catch (err) {
+      console.log(err);
     }
-  };
+  }
 
 
   return (
@@ -125,7 +100,7 @@ function EmployeeForm() {
 
         onSubmit={(values) => {
           console.log(values);
-          
+
           submitEmployee(values);
         }}
       >
@@ -178,7 +153,7 @@ function EmployeeForm() {
             <div style={{ display: "flex", justifyContent: "center", alignItems: "flex-start", marginBottom: "24px" }}>
 
               <FormControl
-                sx={{ flex:1, marginRight: "10px" }}
+                sx={{ flex: 1, marginRight: "10px" }}
                 variant="outlined"
               >
                 <Field name="phone">
@@ -207,58 +182,16 @@ function EmployeeForm() {
                 </Field>
               </FormControl>
 
-              <FormControl sx={{ flex: 1 }}>
-                <Field
-                  component={Autocomplete}
-                  multiple
-                  options={options}
-                  value={values.skills}
-                  freeSolo
-                  name="skills"
-                  sx={{ flex: 1 }}
-                  inputValue={inputValue}
-                  onInputChange={(event, newInputValue) => {
-                    setInputValue(newInputValue); // Track input value for filtering
-                  }}
-                  onChange={(event, value) => {
-                    // Handle freeSolo custom entries by checking if it's a string
-                    const formattedValue = value.map((item) =>
-                      typeof item === 'string'
-                        ? { _id: null, name: item } // Create object with _id as null
-                        : item // Return existing object if it's already structured
-                    );
-                    setFieldValue('skills', formattedValue);
-                  }}
-                  getOptionLabel={(option) => typeof option === 'string' ? option : option.name} // Handle both freeSolo and existing options
-                  filterOptions={(options, { inputValue }) => {
-                    const filteredOptions = inputValue
-                      ? options.filter(option =>
-                        option.name && option.name.toLowerCase().includes(inputValue.toLowerCase())
-                      )
-                      : [];
 
-                    // Add the input value as an object with _id: null if it's not already present
-                    if (inputValue !== '' && !filteredOptions.some(option => option.name === inputValue)) {
-                      filteredOptions.push({
-                        _id: null,
-                        name: inputValue
-                      });
-                    }
+              <SkillsMultiSelectField
+                name="skills"
+                label="Add skills"
+                setFieldValue={(name, value) => setFieldValue(name, value)}
+                values={values}
+                errors={errors}
+                touched={touched}
+              />
 
-                    return filteredOptions;
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      variant="outlined"
-                      label="Add Skill"
-                      onKeyDown={handleAddOption} // Optional: handle keydown if needed
-                      error={Boolean(errors.skills && touched.skills)}
-                      helperText={touched.skills && errors.skills ? errors.skills : ''}
-                    />
-                  )}
-                />
-              </FormControl>
 
             </div>
 

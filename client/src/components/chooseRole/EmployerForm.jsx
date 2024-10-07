@@ -7,7 +7,8 @@ import axios from 'axios';
 import { serverURL } from '../../constants';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { changeRole } from '../../redux';
+import { changeRole, editToken } from '../../redux';
+import { useAxios } from '../../hooks/useAxios';
 
 
 const validationSchema = Yup.object({
@@ -24,24 +25,29 @@ function EmployerForm() {
     const token = useSelector(state => state.auth.token)
     const navigate = useNavigate()
     const dispatch = useDispatch()
-    
-    const submitEmployer = (companyName, companyDescription, specialties, phone, email, address) => {
-        axios.post(`${serverURL}/auth/employer`, {
-            companyName,
-            companyDescription,
-            specialties,
-            contactInfo: {
-                phone,
-                email,
-            },
-            address
-        },
-            { headers: { accessToken: token } }
 
-        ).then(response => {
-            dispatch(changeRole("employer"))
-            navigate('/')
-        })
+
+    const { fetchData: submitData } = useAxios({
+        url: `/auth/employer`,
+        method: "POST",
+        manual: true
+    })
+
+    const submitEmployer = (values) => {
+        try {
+            const result = submitData({
+                body: values
+            })
+
+            if (result && !result.error) {
+                dispatch(editToken(result.token))
+                dispatch(changeRole("employer"))
+                navigate('/')
+            }
+        }
+        catch (err) {
+            console.log(err)
+        }
     }
 
 
@@ -60,7 +66,7 @@ function EmployerForm() {
                 validationSchema={validationSchema}
                 onSubmit={(values) => {
                     console.log(`${values.companyName} | ${values.companyDescription} |  ${values.specialties} |  ${values.email} |  ${values.phone} |  ${values.addres} |`)
-                    submitEmployer(values.companyName, values.companyDescription, values.specialties, values.email, values.phone, values.addres)
+                    submitEmployer(values)
                 }}
 
             >

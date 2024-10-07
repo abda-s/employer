@@ -1,10 +1,8 @@
 import React from 'react'
-import { useSelector } from 'react-redux';
 import { Modal, TextField, Button, Box, FormControl } from '@mui/material';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import axios from "axios"
-import { serverURL } from '../../constants';
+import { useAxios } from '../../hooks/useAxios';
 
 const validationSchema = Yup.object({
     password: Yup.string().required('Password Required')
@@ -12,22 +10,28 @@ const validationSchema = Yup.object({
 
 function ResetUserPassModel({ isVisible, onClose, userId }) {
 
-    const accessToken = useSelector(state => state.auth.token)
-
-    const resetPassReq = (password, userId) => {
-        axios.put(`${serverURL}/users/reset-user-password`, { userId, password }, { headers: { accessToken } })
-            .then(response => {
+    const { fetchData: resetPassFetch } = useAxios({
+        url: `/users/reset-user-password`,
+        method: 'PUT',
+        manual: true
+    });
+    const resetPassSubmit = async (password, userId) => {
+        try {
+            const result = await resetPassFetch({ body: { userId, password } })
+            if (result && !result.error) {
                 onClose();
-            })
-            .catch(err => {
-                console.log(err.response.data);
-            });
+            }
+        } catch (err) {
+            console.log(err)
+        }
+
+
     }
 
     return (
         <Modal
             open={isVisible}
-            onBackdropClick={() => { onClose() }}
+            onClose={() =>  onClose() }
             sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
         >
             <Box component="section" sx={{ p: 2, m: 1, borderRadius: 3, backgroundColor: "white", display: "flex", flexDirection: "column", width: { xs: "100%", sm: "100%", lg: "550px", xl: "550px" } }}>
@@ -37,7 +41,7 @@ function ResetUserPassModel({ isVisible, onClose, userId }) {
                     initialValues={{ password: '' }}
                     validationSchema={validationSchema}
                     onSubmit={(values) => {
-                        resetPassReq(values.password, userId)
+                        resetPassSubmit(values.password, userId)
                     }}
                 >
 
