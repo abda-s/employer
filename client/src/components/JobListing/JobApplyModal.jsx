@@ -2,38 +2,44 @@ import React, { useState } from 'react';
 import { Modal, Box, TextField, Button } from '@mui/material';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
-import axios from 'axios';
-import { serverURL } from '../../constants';
-import { useSelector } from 'react-redux';
+import { useAxios } from '../../hooks/useAxios';
 
 const validationSchema = Yup.object({
     coverLetter: Yup.string().required('Cover Letter is required'),
 });
 
 function JobApplyModal({ isVisible, onClose, id }) {
-    const token = useSelector(state => state.auth.token)
 
+    const { fetchData } = useAxios({
+        url: `/application`,
+        method: "POST",
+        manual: true
+    })
 
-    const onApply = (coverLetter) => {
-        console.log(id)
-        axios.post(`${serverURL}/application`,
-            { coverLetter, jobPostingId: id },
-            { headers: { accessToken: token } })
-            .then(response => {
+    const onApply = async (coverLetter) => {
+        try {
+            const response = await fetchData({
+                body: {
+                    coverLetter, jobPostingId: id
+                }
+            })
+
+            if (response && !response.error) {
                 onClose()
-            })
-            .catch(error => {
-                console.log(error.response.data)
-            })
+            }
+        }
+        catch (error) {
+            console.log(error.response.data)
+        }
     }
 
     return (
         <Modal
             open={isVisible}
             onClose={onClose}
-            sx={{ display: "flex",alignItems:"center",justifyContent:"center" }}
+            sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
         >
-            <Box component="section" sx={{ p: 2, backgroundColor: "white", borderRadius: 3, margin: "10px", display: "flex", flexDirection: "column", width:"500px",boxSizing:"border-box"}}>
+            <Box component="section" sx={{ p: 2, backgroundColor: "white", borderRadius: 3, margin: "10px", display: "flex", flexDirection: "column", width: "500px", boxSizing: "border-box" }}>
 
                 <Formik
                     initialValues={{ coverLetter: "" }}
@@ -42,7 +48,7 @@ function JobApplyModal({ isVisible, onClose, id }) {
                         onApply(values.coverLetter)
                     }}
                 >
-                    {({ values, handleChange, handleBlur, handleSubmit, errors, touched, setFieldValue }) => (
+                    {({ values, handleChange, handleBlur, handleSubmit, errors, touched }) => (
                         <Form onSubmit={handleSubmit} style={{ width: "100%" }}>
                             <div style={{ marginBottom: "20px", width: "100%" }}>
                                 <div style={{ display: "flex", alignItems: "flex-start", marginBottom: "10px", width: "100%" }}>
