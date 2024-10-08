@@ -1,13 +1,15 @@
 import React from 'react'
 import LoginForm from "../components/loginAndSignup/LoginForm";
-import LoginPageLayout from '../components/loginAndSignup/LoginPageLayout';
+import LoginSignupLayout from '../layout/LoginSignupLayout';
+import LiveCollaboration from "../assetes/Live-collaboration.svg"
+import "../styles/loginPage.css"
 
 
 function LoginPage() {
     return (
-        <LoginPageLayout>
+        <LoginSignupLayout imageSrc={LiveCollaboration} title="Login" >
             <LoginForm />
-        </LoginPageLayout>
+        </LoginSignupLayout>
     )
 }
 

@@ -1,13 +1,14 @@
 import React from 'react'
 import SignupForm from '../components/loginAndSignup/SignupForm'
-import SignupPageLayout from '../components/loginAndSignup/SignupPageLayout'
+import LoginSignupLayout from '../layout/LoginSignupLayout'
+import sharedGols from "../assetes/Shared-goals.svg"
+
 function SignupPage() {
-
-
     return (
-        <SignupPageLayout>
+        <LoginSignupLayout imageSrc={sharedGols} title="Sign up" >
             <SignupForm />
-        </SignupPageLayout>
+        </LoginSignupLayout>
+        
     )
 }
 

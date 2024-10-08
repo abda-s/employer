@@ -41,7 +41,6 @@ export default function LoginForm() {
 
     return (
         <div className='form-con'>
-            <div className='sigin-in-email'>Login</div>
             <Formik
                 initialValues={{ email: '', password: '' }}
                 validationSchema={validationSchema}
