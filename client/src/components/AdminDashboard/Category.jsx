@@ -3,25 +3,23 @@ import { Box, Card, Typography, IconButton, Button } from "@mui/material";
 import EditCategoryModal from './EditCategoryModal';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
-import axios from 'axios';
-import { serverURL } from '../../constants';
-import { useSelector } from 'react-redux';
+import { useAxios } from '../../hooks/useAxios';
+
 
 
 function Category({ item, index, setToRefreshFetch }) {
     const [isEditCategoryVisible, setIsEditCategoryVisible] = useState(false)
 
-    const accessToken = useSelector(state => state.auth.token)
-
-    const hendelDelete = (id) => {
-        axios.delete(`${serverURL}/skills/delete-category/${id}`, { headers: { accessToken } })
-            .then(res => {
-                setToRefreshFetch(res.data)
-
-            })
-            .catch(err => {
-                console.log(err)
-            })
+    const { fetchData: deleteCategory } = useAxios({ method: 'DELETE', manual: true })
+    const hendelDelete = async (id) => {
+        try {
+            const result = await deleteCategory({ url: `/skills/delete-category/${id}` })
+            if (result && !result.error) {
+                setToRefreshFetch(result)
+            }
+        } catch (err) {
+            console.log(err)
+        }
     }
 
     return (

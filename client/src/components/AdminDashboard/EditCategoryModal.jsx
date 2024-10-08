@@ -5,9 +5,7 @@ import SkillList from './EditCategoryModal/SkillList';
 import SkillEditor from './EditCategoryModal/SkillEditor';
 import CategoryField from './EditCategoryModal/CategoryField';
 import * as Yup from 'yup';
-import axios from 'axios';
-import { serverURL } from '../../constants';
-import { useSelector } from 'react-redux';
+import { useAxios } from '../../hooks/useAxios';
 
 const validationSchema = Yup.object({
     category: Yup.string().required('Category Required'),
@@ -15,13 +13,12 @@ const validationSchema = Yup.object({
 
 function EditCategoryModal({ isVisible, onClose, category, skillsList, setToRefreshFetch }) {
     const [skills, setSkills] = useState(skillsList); // Use the skillsList prop as the initial state
-    const [error, setErorr] = useState('')
-    const accessToken = useSelector(state => state.auth.token)
+    const [editingIndex, setEditingIndex] = useState(null); // -1 for adding new skill
+
     useEffect(() => {
         setSkills(skillsList)
     }, [isVisible])
 
-    const [editingIndex, setEditingIndex] = useState(null); // -1 for adding new skill
 
     const handleSkillSave = (index, newSkillValue) => {
         if (index === -1) {
@@ -36,14 +33,18 @@ function EditCategoryModal({ isVisible, onClose, category, skillsList, setToRefr
         setEditingIndex(null); // Reset editing index after save
     };
 
+    const { fetchData: deleteSkill } = useAxios({
+        method: 'DELETE',
+        manual: true
+    })
     const handleSkillDelete = async (index) => {
         try {
-
-            if (skills[index]._id) {
-                const res = await axios.delete(`${serverURL}/skills/delete-skill/${skills[index]._id}`, {
-                    headers: { accessToken },
-                });
-                setToRefreshFetch(res.data);
+            const skillsId = skills[index]._id
+            if (skillsId) {
+                const result = await deleteSkill({ url: `/skills/delete-skill/${skillsId}` })
+                if (result && !result.error) {
+                    setToRefreshFetch(result)
+                }
             }
             const updatedSkills = skills.filter((_, i) => i !== index);
             setSkills(updatedSkills);
@@ -56,8 +57,14 @@ function EditCategoryModal({ isVisible, onClose, category, skillsList, setToRefr
 
     };
 
-    const handleSubmit = async (categoryNameFinal) => {
-        const data = {
+    const { fetchData: updateCategory } = useAxios({
+        url: `/skills/edit-category-with-its-skills`,
+        method: 'PUT',
+        manual: true
+    })
+
+    const submitEditCategory = async (categoryNameFinal) => {
+        const categoryData = {
             category: {
                 name: categoryNameFinal,
                 _id: category._id,
@@ -66,19 +73,10 @@ function EditCategoryModal({ isVisible, onClose, category, skillsList, setToRefr
         };
 
         try {
-            // Await the axios request
-            const res = await axios.put(
-                `${serverURL}/skills/edit-category-with-its-skills`,
-                data,
-                { headers: { accessToken } }
-            );
-
-            if (res.data.error) {
-                console.log('Error: ', res.data.error);
-                setErorr(res.data.error);
-            } else {
-                onClose();
-                setToRefreshFetch(res.data);
+            const result = await updateCategory({ body: categoryData })
+            if (result && !result.error) {
+                setToRefreshFetch(result)
+                onClose()
             }
         } catch (err) {
             console.log('Error: ', err);
@@ -98,7 +96,7 @@ function EditCategoryModal({ isVisible, onClose, category, skillsList, setToRefr
                     initialValues={{ skills: skillsList, category: category.name }} // Use skillsList directly
                     validationSchema={validationSchema}
                     enableReinitialize
-                    onSubmit={values => handleSubmit(values.category)}
+                    onSubmit={values => submitEditCategory(values.category)}
                 >
                     {({ values, handleSubmit, handleChange }) => (
                         <Form onSubmit={handleSubmit} style={{ width: '100%' }}>
@@ -126,7 +124,7 @@ function EditCategoryModal({ isVisible, onClose, category, skillsList, setToRefr
                             {editingIndex === null && (
                                 <Box sx={addSkillButtonStyles}>
                                     <Button
-                                    sx={{mt:1}}
+                                        sx={{ mt: 1 }}
                                         variant="outlined"
                                         onClick={() => setEditingIndex(-1)} // Set editing index to -1 to add new skill
                                     >

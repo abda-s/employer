@@ -1,31 +1,28 @@
-import axios from 'axios'
-import React, { useEffect, useState } from 'react'
-import { serverURL } from '../../constants'
-import { useSelector } from 'react-redux'
+import React, { useState } from 'react'
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
-import { Box, Button } from "@mui/material";
+import { Box, Button, CircularProgress } from "@mui/material";
 import Category from './Category';
 import AddCategoryModal from './AddCategoryModal';
 import UncategorizedSkills from './UncategorizedSkills';
+import { useAxios } from '../../hooks/useAxios';
 function CategorysView() {
-    const accessToken = useSelector(state => state.auth.token)
-    const [data, setData] = useState([])
     const [addCatIsVisible, setAddCatIsVisible] = useState(false)
-
     const [toRefreshFetch, setToRefreshFetch] = useState(null)
 
 
-    useEffect(() => {
-        axios.get(`${serverURL}/skills/categories-with-skills`, { headers: { accessToken } })
-            .then(res => {
-                setData(res.data)
-            })
-            .catch(err => {
-                console.log(err.data);
+    const { response: categoryData, isLoading } = useAxios({
+        url: `/skills/categories-with-skills`,
+        method: 'GET',
+        dependencies: [toRefreshFetch]
+    })
 
-            })
-    }, [toRefreshFetch])
-
+    if (isLoading) {
+        return (
+            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", width: "100%" }}>
+                <CircularProgress />
+            </Box>
+        )
+    }
 
     return (
         <Box sx={{ width: "100%", height: "100%" }}>
@@ -48,11 +45,11 @@ function CategorysView() {
             <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 3 }}>
                 <Masonry>
 
-                    {data?.map((item, index) => (
+                    {categoryData?.map((item, index) => (
                         item.category.name === "Uncategorized" ? (
                             item.skills.length > 0 && (
                                 <UncategorizedSkills
-                                    data={data}
+                                    data={categoryData}
                                     key={index}
                                     item={item}
                                     index={index}
@@ -68,8 +65,6 @@ function CategorysView() {
                             />
                         )
                     ))}
-
-
                 </Masonry>
             </ResponsiveMasonry>
         </Box>

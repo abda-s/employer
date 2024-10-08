@@ -3,27 +3,26 @@ import { useSelector } from 'react-redux';
 import { Modal, TextField, Button, Box, FormControl } from '@mui/material';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import axios from "axios"
-import { serverURL } from '../../constants';
+import { useAxios } from '../../hooks/useAxios';
 
 
 const validationSchema = Yup.object({
     categoryName: Yup.string().required('Category Name Required')
 });
 
-function AddCategoryModal({ isVisible, onClose,setToRefreshFetch}) {
-    const accessToken = useSelector(state => state.auth.token)
-    
+function AddCategoryModal({ isVisible, onClose, setToRefreshFetch }) {
 
-    const addCategoryReq = (categoryName) => {
-        axios.post(`${serverURL}/skills/add-category`, { categoryName }, { headers: { accessToken } })
-            .then(response => {
-                onClose();
-                setToRefreshFetch(response.data)
-            })
-            .catch(err => {
-                console.log(err);
-            });
+    const { fetchData: addCategory } = useAxios({ method: "POST", manual: true })
+    const handleSubmit = async (categoryName) => {
+        try {
+            const result = await addCategory({ url: "/skills/add-category", body: { categoryName } })
+            if(result && !result.error) {
+                setToRefreshFetch(result)
+                onClose()
+            }
+        } catch (err) {
+            console.log(err)
+        }
     }
 
 
@@ -40,7 +39,7 @@ function AddCategoryModal({ isVisible, onClose,setToRefreshFetch}) {
                     initialValues={{ categoryName: '' }}
                     validationSchema={validationSchema}
                     onSubmit={(values) => {
-                        addCategoryReq(values.categoryName)
+                        handleSubmit(values.categoryName)
                     }}
                 >
 
