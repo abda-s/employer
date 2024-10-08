@@ -10,10 +10,10 @@ import CVBuilderPage from '../pages/CVBuilderPage';
 import JobPostingPage from '../pages/JobPostingPage';
 import JobListingPage from '../pages/JobListingPage';
 import AppliedAppsPage from '../pages/AppliedAppsPage';
-import UsersPage from '../pages/UsersPage';
-import JobsAdminPage from '../pages/JobsAdminPage';
-import JobPostingDetails from '../pages/JobPostingDetails';
-import SkillsPage from '../pages/SkillsPage';
+import UsersPage from '../pages/admin/UsersPage';
+import JobsAdminPage from '../pages/admin/JobsAdminPage';
+import JobPostingDetails from '../pages/admin/JobPostingDetails';
+import SkillsPage from '../pages/admin/SkillsPage';
 
 function RoutesRender() {
     const loggedIn = useSelector(state => state.auth.loggedIn);
