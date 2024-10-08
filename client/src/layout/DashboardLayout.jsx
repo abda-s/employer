@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box } from '@mui/material';
-import NavBar from './NavBar';
-import DashboardSideMenu from './DashboradSideMenu';
+import NavBar from '../components/NavBar';
+import DashboardSideMenu from '../components/DashboradSideMenu';
 
 function DashboardLayout({ children }) {
     return (

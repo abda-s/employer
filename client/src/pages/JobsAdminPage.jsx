@@ -1,5 +1,5 @@
 import React from 'react'
-import DashboardLayout from '../components/DashboardLayout'
+import DashboardLayout from '../layout/DashboardLayout'
 import JobsTable from '../components/adminDashboard/JobsTable'
 
 function JobsAdminPage() {
