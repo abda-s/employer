@@ -3,10 +3,9 @@ import { Modal, Box, Button, MenuItem, Select, InputLabel, FormControl, IconButt
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import { Autocomplete, TextField } from '@mui/material';
-import axios from 'axios';
-import { serverURL } from '../../constants';
-import { useSelector } from 'react-redux';
+
 import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
+import { useAxios } from '../../hooks/useAxios';
 
 
 const validationSchema = Yup.object({
@@ -15,7 +14,6 @@ const validationSchema = Yup.object({
 });
 
 function SelectCategoryForSkillModal({ data, isVisible, onClose, skillsList, setToRefreshFetch }) {
-    const accessToken = useSelector(state => state.auth.token);
     const [uncategorizedSkills, setUncategorizedSkills] = useState([]);
 
     useEffect(() => {
@@ -25,14 +23,22 @@ function SelectCategoryForSkillModal({ data, isVisible, onClose, skillsList, set
         }
     }, [isVisible, data, skillsList]);
 
+    const { fetchData: deleteSkill } = useAxios({
+        method: 'delete',
+        manual: true
+    })
+
     const handleSkillDelete = async (i) => {
         try {
-
             if (uncategorizedSkills[i]._id) {
-                const res = await axios.delete(`${serverURL}/skills/delete-skill/${uncategorizedSkills[i]._id}`, {
-                    headers: { accessToken },
-                });
-                setToRefreshFetch(res.data);
+
+                const skillId = uncategorizedSkills[i]._id;
+
+                const result = await deleteSkill({ url: `/skills/delete-skill/${skillId}` })
+
+                if (result && !result.error) {
+                    setToRefreshFetch(result)
+                }
             }
             return true;
         } catch (err) {
@@ -42,12 +48,20 @@ function SelectCategoryForSkillModal({ data, isVisible, onClose, skillsList, set
 
     };
 
+    const { fetchData: editSkill } = useAxios({
+        url: '/skills/categories-skills',
+        method: 'PUT',
+        manual: true,
+    })
 
     const handleSbmit = async (values) => {
+
         try {
-            const res = await axios.put(`${serverURL}/skills/categories-skills`, values, { headers: { accessToken } })
-            onClose();
-            setToRefreshFetch(res)
+            const result = await editSkill({ body: values })
+            if (result && !result.error) {
+                onClose();
+                setToRefreshFetch(result)
+            }
         } catch (err) {
             console.log("Error: ", err);
 

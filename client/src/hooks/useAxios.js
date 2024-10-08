@@ -21,10 +21,12 @@ export const useAxios = ({ url, method, manual = false, dependencies = [] }) => 
             headers['accessToken'] = accessToken;
         }
 
+        const requestUrl = params.url || url;
+
         try {
             const res = await axios({
                 method,
-                url,
+                url: requestUrl,
                 data: (method === 'POST' || method === 'PUT') ? params.body : undefined,
                 headers,
             });
@@ -44,6 +46,7 @@ export const useAxios = ({ url, method, manual = false, dependencies = [] }) => 
             setIsLoading(false);
         }
     }, [accessToken, method, url]);
+
 
     useEffect(() => {
         if (!manual) {
