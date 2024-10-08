@@ -17,7 +17,7 @@ const validationSchema = Yup.object({
     skills: Yup.array().min(1, 'At least one skill is required'),
 });
 
-function JobEditModal({ jobData, isVisible, onClose, onSave, setToRefreshApplications }) {
+function JobEditModal({ jobData, isVisible, onClose, setToRefreshApplications }) {
     const [initalSkills, setInitalSkills] = useState([])
 
 
@@ -30,17 +30,13 @@ function JobEditModal({ jobData, isVisible, onClose, onSave, setToRefreshApplica
         setInitalSkills(skillList)
     }, []);
 
-    const { fetchData } = useAxios({
-        url: `/job-posting/edit-job`,
-        method: "PUT",
-        manual: true
-    })
-
+    const { fetchData : editJob } = useAxios({method: "PUT",manual: true})
     const handleSubmitSkills = async (values) => {
         console.log("values", values);
-        
+
         try {
-            const result = await fetchData({
+            const result = await editJob({
+                url: `/job-posting/edit-job`,
                 body: {
                     ...values,
                     postId: jobData._id

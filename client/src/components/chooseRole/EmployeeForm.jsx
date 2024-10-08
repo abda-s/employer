@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextField, FormControl,Button, IconButton } from '@mui/material';
+import { TextField, FormControl, Button, IconButton } from '@mui/material';
 
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -7,7 +7,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Formik, Form, Field, FieldArray, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import InputMask from 'react-input-mask';
-import { useDispatch} from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { changeRole, editToken } from '../../redux';
 
@@ -55,11 +55,7 @@ function EmployeeForm() {
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
-  const { fetchData: submitEmployeeData } = useAxios({
-    url: `/auth/employee`,
-    method: 'POST',
-    manual: true
-  })
+  const { fetchData: submitEmployeeData } = useAxios({ method: 'POST', manual: true })
   const submitEmployee = async (values) => {
     const { firstName, lastName, phone, professionalSummary, skills, experience, education } = values;
 
@@ -73,7 +69,7 @@ function EmployeeForm() {
     }
 
     try {
-      const result = await submitEmployeeData({ body: employeeData });
+      const result = await submitEmployeeData({ url: `/auth/employee`, body: employeeData });
 
       if (result && !result.error) {
         dispatch(editToken(result.token))

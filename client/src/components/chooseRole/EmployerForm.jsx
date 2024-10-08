@@ -3,9 +3,7 @@ import { TextField, FormControl, Autocomplete, Button } from '@mui/material';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import InputMask from 'react-input-mask';
-import axios from 'axios';
-import { serverURL } from '../../constants';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch} from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { changeRole, editToken } from '../../redux';
 import { useAxios } from '../../hooks/useAxios';
@@ -22,23 +20,17 @@ const validationSchema = Yup.object({
 
 function EmployerForm() {
     const [options, setOptions] = useState([]);
-    const token = useSelector(state => state.auth.token)
     const navigate = useNavigate()
     const dispatch = useDispatch()
 
 
-    const { fetchData: submitData } = useAxios({
-        url: `/auth/employer`,
-        method: "POST",
-        manual: true
-    })
-
+    const { fetchData: submitData } = useAxios({ method: "POST", manual: true })
     const submitEmployer = (values) => {
         try {
             const result = submitData({
+                url: `/auth/employer`,
                 body: values
             })
-
             if (result && !result.error) {
                 dispatch(editToken(result.token))
                 dispatch(changeRole("employer"))

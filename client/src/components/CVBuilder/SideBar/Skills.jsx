@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Divider, Accordion, AccordionDetails, AccordionSummary, Button, Typography, TextField, IconButton, Box} from '@mui/material';
+import { Divider, Accordion, AccordionDetails, AccordionSummary, Button, Typography, TextField, IconButton, Box } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Formik, Form, Field } from 'formik';
@@ -26,61 +26,57 @@ function Skills() {
     const [isEditMode, setIsEditMode] = useState(false);
     const [indexOfItem, setIndexOfItem] = useState(null);
 
-// Use Axios hook for adding a skill
-const { fetchData: addSkillData } = useAxios({
-    url: '/cv/add-skill',
-    method: 'PUT',
-    manual: true,
-});
+    const { fetchData: addSkillData } = useAxios({ method: 'PUT', manual: true });
+    const submitAdd = async (skillId, level) => {
+        try {
+            const result = await addSkillData({ url: '/cv/add-skill', body: { skillId, level } });
+            if (result && !result.error) {
+                setIsEditMode(false);
+                setIndexOfItem(null);
+                dispatch(addSkill(skillId, level));
+            } else {
+                console.log(result.error);
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    };
 
-// Use Axios hook for editing a skill
-const { fetchData: editSkillData } = useAxios({
-    url: '/cv/edit-skill',
-    method: 'PUT',
-    manual: true,
-});
+    const { fetchData: deleteSkillData } = useAxios({ method: 'DELETE', manual: true });
+    const deleteItem = async (index) => {
+        try {
+            const result = await deleteSkillData({ url: `/cv/skill/${index}`, });
+            if (result && !result.error) {
+                setIndexOfItem(null);
+                setIsEditMode(false);
+                dispatch(deleteSkill(index));
+            } else {
+                console.log(result.error);
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    };
 
-// Use Axios hook for deleting a skill
-const { fetchData: deleteSkillData } = useAxios({
-    url: `/cv/skill/${indexOfItem}`,
-    method: 'DELETE',
-    manual: true,
-});
-
-const submitAdd = async (skillId, level) => {
-    const result = await addSkillData({ body: { skillId, level } });
-    if (!result.error) {
-        setIsEditMode(false);
-        setIndexOfItem(null);
-        dispatch(addSkill(skillId, level));
-    } else {
-        console.log(result.error);
-    }
-};
-
-const deleteItem = async (index) => {
-    const result = await deleteSkillData();
-    if (!result.error) {
-        setIndexOfItem(null);
-        setIsEditMode(false);
-        dispatch(deleteSkill(index));
-    } else {
-        console.log(result.error);
-    }
-};
-
-const submitEdit = async (values) => {
-    const { level } = values;
-    const result = await editSkillData({ body: { level, skillsIndex: indexOfItem } });
-    if (!result.error) {
-        setIsEditMode(false);
-        setIndexOfItem(null);
-        dispatch(editSkill(indexOfItem, level));
-    } else {
-        console.log(result.error);
-    }
-};
-
+    const { fetchData: editSkillData } = useAxios({ method: 'PUT', manual: true });
+    const submitEdit = async (values) => {
+        const { level } = values;
+        try {
+            const result = await editSkillData({
+                url: '/cv/edit-skill',
+                body: { level, skillsIndex: indexOfItem }
+            });
+            if (result && !result.error) {
+                setIsEditMode(false);
+                setIndexOfItem(null);
+                dispatch(editSkill(indexOfItem, level));
+            } else {
+                console.log(result.error);
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    };
     return !isEditMode ? (
         <Accordion
             sx={{

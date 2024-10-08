@@ -21,22 +21,21 @@ export default function LoginForm() {
     const dispatch = useDispatch();
 
     // Using the useAxios hook
-    const { isLoading, fetchData } = useAxios({
-        url: '/auth/login',
-        method: 'POST',
-        manual: true, // Manual trigger for the request
-    });
-
-    // Handle form submission
+    const { isLoading, fetchData: fetchLogin } = useAxios({ method: 'POST', manual: true });
     const loginSubmit = async (values) => {
-        const result = await fetchData({ body: values }); // Await the fetchData call
-    
-        if (result && !result.error) {
-            dispatch(logIn(result.email, result.role, result.token, result.id));
-            navigate(`/`);
-            console.log(result);
-        } else {
-            setError(result?.error); // Handle the error appropriately
+        try {
+            const result = await fetchLogin({ body: values, url: '/auth/login' }); // Await the fetchData call
+
+            if (result && !result.error) {
+                dispatch(logIn(result.email, result.role, result.token, result.id));
+                navigate(`/`);
+                console.log(result);
+            } else {
+                setError(result?.error); // Handle the error appropriately
+            }
+        }
+        catch (err) {
+            console.log(err)
         }
     };
 

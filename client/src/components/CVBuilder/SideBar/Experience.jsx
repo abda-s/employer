@@ -11,9 +11,9 @@ import * as Yup from 'yup';
 import moment from 'moment';
 import dayjs from "dayjs"
 
-
 import { addExperience, deleteExperience, editExperience } from '../../../redux';
 import { useAxios } from '../../../hooks/useAxios';
+
 
 const validationSchema = Yup.object({
     jobTitle: Yup.string().required('Job Title is required'),
@@ -30,70 +30,64 @@ const validationSchema = Yup.object({
 
 function Experience() {
     const data = useSelector(state => state.cv)
-    const token = useSelector(state => state.auth.token)
     const dispatch = useDispatch()
 
     const [isEditMode, setIsEditMode] = useState(false)
     const [indexOfItem, setIndexOfItem] = useState(null)
 
-
-    const { fetchData: editExperienceData } = useAxios({
-        url: `/cv/edit-experience`,
-        method: 'PUT',
-        manual: true,
-    });
-
-    // useAxios hook for adding experience
-    const { fetchData: addExperienceData } = useAxios({
-        url: `/cv/add-experience`,
-        method: 'PUT',
-        manual: true,
-    });
-
-    // useAxios hook for deleting experience
-    const { fetchData: deleteExperienceData } = useAxios({
-        url: `/cv/experience/${indexOfItem}`,
-        method: 'DELETE',
-        manual: true,
-    });
-
+    
+    const { fetchData: editExperienceData } = useAxios({ method: 'PUT', manual: true });
     const submitEdit = async (values) => {
         const params = { ...values, experienceIndex: indexOfItem };
-        const result = await editExperienceData({ body: params });
-
-        if (!result.error) {
-            setIsEditMode(false);
-            setIndexOfItem(null);
-            const { jobTitle, companyName, description, startDate, endDate } = values
-            dispatch(editExperience(indexOfItem, jobTitle, companyName, description, startDate, endDate));
-        } else {
-            console.log(result.error);
+        try {
+            const result = await editExperienceData({ url: `/cv/edit-experience`, body: params });
+            if (result && !result.error) {
+                setIsEditMode(false);
+                setIndexOfItem(null);
+                const { jobTitle, companyName, description, startDate, endDate } = values
+                dispatch(editExperience(indexOfItem, jobTitle, companyName, description, startDate, endDate));
+            } else {
+                console.log(result.error);
+            }
+        } catch (err) {
+            console.log(err);
         }
     };
 
 
+    // useAxios hook for adding experience
+    const { fetchData: addExperienceData } = useAxios({ method: 'PUT', manual: true });
     const submitAdd = async (values) => {
-        const result = await addExperienceData({ body: values });
-        if (!result.error) {
-            setIsEditMode(false);
-            const { jobTitle, companyName, description, startDate, endDate } = values
-            dispatch(addExperience(jobTitle, companyName, description, startDate, endDate));
-        } else {
-            console.log(result.error);
+        try {
+            const result = await addExperienceData({ url: `/cv/add-experience`, body: values });
+            if (result && !result.error) {
+                setIsEditMode(false);
+                const { jobTitle, companyName, description, startDate, endDate } = values
+                dispatch(addExperience(jobTitle, companyName, description, startDate, endDate));
+            } else {
+                console.log(result.error);
+            }
+        } catch (err) {
+            console.log(err);
         }
     };
 
 
-    const deleteItem = async () => {        
-        const result = await deleteExperienceData();
-        if (!result.error) {
-          setIsEditMode(false);
-          dispatch(deleteExperience(indexOfItem));
-        } else {
-          console.log(result.error);
+    // useAxios hook for deleting experience
+    const { fetchData: deleteExperienceData } = useAxios({method: 'DELETE',manual: true});
+    const deleteItem = async (index) => {
+        try {
+            const result = await deleteExperienceData({url: `/cv/experience/${index}`});
+            if (result && !result.error) {
+                setIsEditMode(false);
+                dispatch(deleteExperience(index));
+            } else {
+                console.log(result.error);
+            }
+        } catch (err) {
+            console.log(err);
         }
-      };
-
+    };
 
 
     return !isEditMode ? (
@@ -200,7 +194,7 @@ function Experience() {
                     }
                 }}
             >
-                {({ values, handleChange, handleBlur, handleSubmit, errors, touched}) => (
+                {({ values, handleChange, handleBlur, handleSubmit, errors, touched }) => (
                     <Form
                         onSubmit={handleSubmit}
                         style={{ width: "100%" }}
@@ -298,7 +292,7 @@ function Experience() {
 
                             {(indexOfItem !== 0 && indexOfItem !== null) && (
                                 <div style={{ display: "flex", flex: 1, justifyContent: "center" }}>
-                                    <IconButton onClick={() => { deleteItem(); setIndexOfItem(null); }}><DeleteIcon sx={{ fontSize: "30px" }} /></IconButton>
+                                    <IconButton onClick={() => { deleteItem(indexOfItem); setIndexOfItem(null); }}><DeleteIcon sx={{ fontSize: "30px" }} /></IconButton>
                                 </div>
                             )}
                             <div style={{ flex: 1, marginRight: "10px" }} >

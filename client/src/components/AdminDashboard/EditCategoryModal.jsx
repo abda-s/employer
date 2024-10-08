@@ -33,10 +33,7 @@ function EditCategoryModal({ isVisible, onClose, category, skillsList, setToRefr
         setEditingIndex(null); // Reset editing index after save
     };
 
-    const { fetchData: deleteSkill } = useAxios({
-        method: 'DELETE',
-        manual: true
-    })
+    const { fetchData: deleteSkill } = useAxios({ method: 'DELETE', manual: true })
     const handleSkillDelete = async (index) => {
         try {
             const skillsId = skills[index]._id
@@ -57,12 +54,7 @@ function EditCategoryModal({ isVisible, onClose, category, skillsList, setToRefr
 
     };
 
-    const { fetchData: updateCategory } = useAxios({
-        url: `/skills/edit-category-with-its-skills`,
-        method: 'PUT',
-        manual: true
-    })
-
+    const { fetchData: updateCategory } = useAxios({ method: 'PUT', manual: true })
     const submitEditCategory = async (categoryNameFinal) => {
         const categoryData = {
             category: {
@@ -73,7 +65,7 @@ function EditCategoryModal({ isVisible, onClose, category, skillsList, setToRefr
         };
 
         try {
-            const result = await updateCategory({ body: categoryData })
+            const result = await updateCategory({ url: `/skills/edit-category-with-its-skills`, body: categoryData })
             if (result && !result.error) {
                 setToRefreshFetch(result)
                 onClose()

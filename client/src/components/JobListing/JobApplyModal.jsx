@@ -8,17 +8,13 @@ const validationSchema = Yup.object({
     coverLetter: Yup.string().required('Cover Letter is required'),
 });
 
-function JobApplyModal({ isVisible, onClose, id ,setToRefeshJobListing }) {
+function JobApplyModal({ isVisible, onClose, id, setToRefeshJobListing }) {
 
-    const { fetchData } = useAxios({
-        url: `/application`,
-        method: "POST",
-        manual: true
-    })
-
+    const { fetchData: applyApplication } = useAxios({ method: "POST", manual: true })
     const onApply = async (coverLetter) => {
         try {
-            const response = await fetchData({
+            const response = await applyApplication({
+                url: `/application`,
                 body: {
                     coverLetter, jobPostingId: id
                 }

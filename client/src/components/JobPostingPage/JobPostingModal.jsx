@@ -19,15 +19,10 @@ const validationSchema = Yup.object({
 
 function JobPostingModal({ isVisible, setIsVisible, setToRefresh }) {
 
-    const { fetchData } = useAxios({
-        url: "/job-posting/add-job",
-        method: "POST",
-        manual: true
-    })
-
+    const { fetchData: editJob } = useAxios({ method: "POST", manual: true })
     const handleSubmitReq = async (values) => {
         try {
-            const result = await fetchData({ body: values })
+            const result = await editJob({ url: "/job-posting/add-job", body: values })
 
             if (result && !result.error) {
                 setIsVisible(false)

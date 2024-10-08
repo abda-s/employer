@@ -23,11 +23,7 @@ function SelectCategoryForSkillModal({ data, isVisible, onClose, skillsList, set
         }
     }, [isVisible, data, skillsList]);
 
-    const { fetchData: deleteSkill } = useAxios({
-        method: 'delete',
-        manual: true
-    })
-
+    const { fetchData: deleteSkill } = useAxios({ method: 'delete', manual: true })
     const handleSkillDelete = async (i) => {
         try {
             if (uncategorizedSkills[i]._id) {
@@ -48,16 +44,10 @@ function SelectCategoryForSkillModal({ data, isVisible, onClose, skillsList, set
 
     };
 
-    const { fetchData: editSkill } = useAxios({
-        url: '/skills/categories-skills',
-        method: 'PUT',
-        manual: true,
-    })
-
+    const { fetchData: editSkill } = useAxios({ method: 'PUT', manual: true })
     const handleSbmit = async (values) => {
-
         try {
-            const result = await editSkill({ body: values })
+            const result = await editSkill({ url: '/skills/categories-skills', body: values })
             if (result && !result.error) {
                 onClose();
                 setToRefreshFetch(result)

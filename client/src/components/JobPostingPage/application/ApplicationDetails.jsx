@@ -1,4 +1,4 @@
-import React, {  useState } from 'react';
+import React, { useState } from 'react';
 import { Select, MenuItem, InputLabel, FormControl, Button, IconButton, useMediaQuery } from '@mui/material';
 import { useReactToPrint } from 'react-to-print';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -12,17 +12,16 @@ function ApplicationDetails({ item, status, cv, setToRefreshApplications }) {
     const [isCV, setIsCV] = useState(false)
     const isMobile = useMediaQuery('(max-width:600px)');
 
-    const { fetchData } = useAxios({
-        url: `/application/change-status`,
-        method: "PUT",
-        manual: true,
-    })
-
+    const { fetchData: editStatus } = useAxios({ method: "PUT", manual: true })
     const handleChange = async (event) => {
         const newStatus = event.target.value;
         // Make a request to the server when the status changes
         try {
-            const result = await fetchData({ body: { status: newStatus, applicationId: item._id } })
+            const result = await editStatus({
+                url: `/application/change-status`,
+                body: { status: newStatus, applicationId: item._id }
+            })
+
             if (result && !result.error) {
                 setToRefreshApplications(result)
             }

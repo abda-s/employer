@@ -6,6 +6,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import { Box, useMediaQuery, TextField, Button } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
+import { useAxios } from '../../hooks/useAxios';
 
 
 function JobsTable() {
@@ -13,23 +14,18 @@ function JobsTable() {
     const navigate = useNavigate()
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
-    const accessToken = useSelector(state => state.auth.token);
-    const [data, setData] = useState([]);
-
+    
+    const [jobs, setJobs] = useState([]);
     const [searchQuery, setSearchQuery] = useState(''); // State for search query
 
+    const {response,  isLoading} = useAxios({url: '/job-posting/all-jobs', method: 'GET'});
     useEffect(() => {
-        axios.get(`${serverURL}/job-posting/all-jobs`, { headers: { accessToken } })
-            .then(res => {
-                const jobsList = res.data.map(item => ({ ...item, id: item._id }));
-                setData(jobsList);
-            })
-            .catch(err => {
-                setData([]);
-                console.log(err);
-            });
-    }, []);
+        if (response && !response.error) {
+            const jobsList = response.map(item => ({ ...item, id: item._id }));
+            setJobs(jobsList); 
+        }
+
+    }, [response]);
 
     const columns = [
         {
@@ -83,7 +79,7 @@ function JobsTable() {
     ];
 
     // Filter the rows based on the search query
-    const filteredRows = data.filter(user =>
+    const filteredRows = jobs?.filter(user =>
         user.jobTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
         user.companyName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         user.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -110,6 +106,7 @@ function JobsTable() {
                 <DataGrid
                     rows={filteredRows} // Use filtered rows
                     columns={columns}
+                    loading={isLoading}
                     disableColumnMenu
                     autoHeight
                     disableColumnResize={!isMobile} // Disable resizing if !isMobile

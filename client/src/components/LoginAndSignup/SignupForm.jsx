@@ -22,23 +22,19 @@ function SignupForm() {
     const [error, setError] = useState('');
     const navigate = useNavigate()
 
-    const { isLoading, fetchData } = useAxios({
-        url: '/auth/signup',
-        method: 'POST',
-        manual: true
-    })
-
+    const { isLoading, fetchData: fetchSignup } = useAxios({ method: 'POST', manual: true })
     const signupReq = async (values) => {
-        const result = await fetchData({ body: values })
-        try{
+        try {
+            const result = await fetchSignup({ body: values, url: '/auth/signup' })
             if (result && !result.error) {
-                navigate('/login')}
+                navigate('/login')
+            }
             else {
                 setError(result?.error)
             }
 
         }
-        catch(err){
+        catch (err) {
             console.log(err.message)
         }
     }

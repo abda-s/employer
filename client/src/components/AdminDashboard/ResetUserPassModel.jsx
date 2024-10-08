@@ -10,14 +10,10 @@ const validationSchema = Yup.object({
 
 function ResetUserPassModel({ isVisible, onClose, userId }) {
 
-    const { fetchData: resetPassFetch } = useAxios({
-        url: `/users/reset-user-password`,
-        method: 'PUT',
-        manual: true
-    });
+    const { fetchData: resetPassFetch } = useAxios({method: 'PUT',manual: true});
     const resetPassSubmit = async (password, userId) => {
         try {
-            const result = await resetPassFetch({ body: { userId, password } })
+            const result = await resetPassFetch({url: `/users/reset-user-password`, body: { userId, password } })
             if (result && !result.error) {
                 onClose();
             }

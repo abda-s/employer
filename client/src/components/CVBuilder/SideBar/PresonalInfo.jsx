@@ -26,16 +26,13 @@ function PresonalInfo() {
 
     const dispatch = useDispatch()
 
-    const { fetchData: editPersonalData } = useAxios({
-        url: `/cv/edit-personal-data`,
-        method: 'PUT',
-        manual: true
-    })
-
-
+    const { fetchData: editPersonalData } = useAxios({method: 'PUT',manual: true})
     const submitEdit = (fullName, phoneNumber, professionalSummary) => {
         try {
-            const result = editPersonalData({ body: { fullName, phoneNumber, professionalSummary } })
+            const result = editPersonalData({ 
+                url: `/cv/edit-personal-data`,            
+                body: { fullName, phoneNumber, professionalSummary }
+             })
             if (result && !result.error) {
                 setIsEditMode(false)
                 dispatch(editPrsonalInfo(fullName, phoneNumber, professionalSummary))
