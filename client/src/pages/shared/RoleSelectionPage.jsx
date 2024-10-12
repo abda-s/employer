@@ -1,7 +1,7 @@
 import React from 'react'
 import NavBar from '../../components/NavBar'
 import ChoseSvg from "../../assetes/Businesswoman-receives-congratulation.svg"
-import ChooseForm from '../../components/chooseRole/ChooseForm'
+import RoleSelectionForm from '../../components/roleSelection/RoleSelectionForm'
 import '../../styles/ChoseRolepage.css'
 function RoleSelectionPage() {
     return (
@@ -11,7 +11,7 @@ function RoleSelectionPage() {
             </div>
             <div className="container">
                 <div className="container-choose-role">
-                    <ChooseForm />
+                    <RoleSelectionForm />
                 </div>
                 <div className="container-choose-image">
                     <img src={ChoseSvg} style={{ width: "90%" }} alt="ChoseSvg" />
