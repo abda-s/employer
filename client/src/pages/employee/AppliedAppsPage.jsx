@@ -1,7 +1,7 @@
 import React from 'react'
-import NavBar from '../components/NavBar'
-import AppliedJobsTable from '../components/AppliedJobsTable'
-import "../styles/AppliedAppsPage.css"
+import NavBar from '../../components/NavBar'
+import AppliedJobsTable from '../../components/AppliedJobsTable'
+import "../../styles/AppliedAppsPage.css"
 
 function AppliedAppsPage() {
     return (

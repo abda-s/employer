@@ -2,18 +2,27 @@ import React, { useEffect, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
-import HomePage from '../pages/HomePage'
-import LoginPage from '../pages/LoginPage';
-import SignupPage from '../pages/SignupPage';
-import ChoseRolepage from '../pages/ChoseRolepage';
-import CVBuilderPage from '../pages/CVBuilderPage';
-import JobPostingPage from '../pages/JobPostingPage';
-import JobListingPage from '../pages/JobListingPage';
-import AppliedAppsPage from '../pages/AppliedAppsPage';
-import UsersPage from '../pages/UsersPage';
-import JobsAdminPage from '../pages/JobsAdminPage';
-import JobPostingDetails from '../pages/JobPostingDetails';
-import SkillsPage from '../pages/SkillsPage';
+//admin
+import UsersManagementPage from '../pages/admin/UsersManagementPage';
+import JobsManagementPage from '../pages/admin/JobsManagementPage';
+import JobPostingDetails from '../pages/admin/JobPostingDetails';
+import SkillsManagementPage from '../pages/admin/SkillsManagementPage';
+
+//auth
+import LoginPage from '../pages/auth/LoginPage';
+import SignupPage from '../pages/auth/SignupPage';
+
+//employee
+import CVBuilderPage from '../pages/employee/CVBuilderPage';
+import JobListingPage from '../pages/employee/JobListingPage';
+import AppliedAppsPage from '../pages/employee/AppliedAppsPage';
+
+//employer
+import JobPostingPage from '../pages/employer/JobPostingPage';
+
+//shared
+import HomePage from '../pages/shared/HomePage'
+import RoleSelectionPage from '../pages/shared/RoleSelectionPage';
 
 function RoutesRender() {
     const loggedIn = useSelector(state => state.auth.loggedIn);
@@ -56,10 +65,10 @@ function RoutesRender() {
             { path: '/dashboard/job-posting', element: <JobPostingPage /> },
         ],
         admin: [
-            { path: '/dashboard/users', element: <UsersPage /> },
-            { path: '/dashboard/jobs', element: <JobsAdminPage /> },
+            { path: '/dashboard/users', element: <UsersManagementPage /> },
+            { path: '/dashboard/jobs', element: <JobsManagementPage /> },
             { path: '/dashboard/jobs/:id', element: <JobPostingDetails /> },
-            { path: '/dashboard/skills', element: <SkillsPage /> },
+            { path: '/dashboard/skills', element: <SkillsManagementPage /> },
 
         ],
     };
@@ -69,7 +78,7 @@ function RoutesRender() {
             {loggedIn ? (
                 <>
                     {!role ? (
-                        <Route path="/choose-role" element={<ChoseRolepage />} />
+                        <Route path="/choose-role" element={<RoleSelectionPage />} />
                     ) : (
                         roleBasedRoutes[role]?.map(({ path, element }) => (
                             <Route key={path} path={path} element={element} />

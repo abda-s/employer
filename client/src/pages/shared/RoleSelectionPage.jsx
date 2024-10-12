@@ -1,9 +1,9 @@
 import React from 'react'
-import NavBar from '../components/NavBar'
-import ChoseSvg from "../assetes/Businesswoman-receives-congratulation.svg"
-import ChooseForm from '../components/chooseRole/ChooseForm'
-import '../styles/ChoseRolepage.css'
-function ChoseRolepage() {
+import NavBar from '../../components/NavBar'
+import ChoseSvg from "../../assetes/Businesswoman-receives-congratulation.svg"
+import ChooseForm from '../../components/chooseRole/ChooseForm'
+import '../../styles/ChoseRolepage.css'
+function RoleSelectionPage() {
     return (
         <div className='all-choose-container' >
             <div style={{ width: "100%", display: "flex" }} >
@@ -21,4 +21,4 @@ function ChoseRolepage() {
     )
 }
 
-export default ChoseRolepage
+export default RoleSelectionPage

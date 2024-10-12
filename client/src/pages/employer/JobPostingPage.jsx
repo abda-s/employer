@@ -1,13 +1,16 @@
 import React, { useState } from 'react'
-import NavBar from '../components/NavBar';
 import { Button, CircularProgress, useMediaQuery } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import "../styles/JobPostingPage.css"
 
-import ApplicationView from '../components/jobPostingPage/application/ApplicationView';
-import JobPostingsView from '../components/jobPostingPage/JobPostingsView';
-import JobPostingModal from '../components/jobPostingPage/JobPostingModal';
-import { useAxios } from '../hooks/useAxios';
+import { useAxios } from '../../hooks/useAxios';
+
+import NavBar from '../../components/NavBar';
+import ApplicationView from '../../components/jobPostingPage/application/ApplicationView';
+import JobPostingsView from '../../components/jobPostingPage/JobPostingsView';
+import JobPostingModal from '../../components/jobPostingPage/JobPostingModal';
+
+import "../../styles/JobPostingPage.css"
+
 
 function JobPostingPage() {
     const [isVisible, setIsVisible] = useState(false);

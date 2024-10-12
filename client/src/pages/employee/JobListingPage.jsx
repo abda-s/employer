@@ -1,7 +1,7 @@
 import React from 'react'
-import NavBar from '../components/NavBar'
-import JobListingView from '../components/jobListing/JobListingView'
-import '../styles/JobListingPage.css'
+import NavBar from '../../components/NavBar'
+import JobListingView from '../../components/jobListing/JobListingView'
+import '../../styles/JobListingPage.css'
 
 function JobListingPage() {
   return (

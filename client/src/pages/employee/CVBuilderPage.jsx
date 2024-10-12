@@ -1,20 +1,19 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { initCV } from '../redux'
+import { initCV } from '../../redux'
 
-import '../styles/CVBuilderPage.css'
-import NavBar from "../components/NavBar"
-import SideBarBuilder from "../components/cvBuilder/SideBarBuilder"
-import CVCanvas from "../components/cvBuilder/CVCanvas"
-import { serverURL } from '../constants'
-import { useAxios } from '../hooks/useAxios'
+import '../../styles/CVBuilderPage.css'
+import NavBar from "../../components/NavBar"
+import SideBarBuilder from "../../components/cvBuilder/SideBarBuilder"
+import CVCanvas from "../../components/cvBuilder/CVCanvas"
+import { useAxios } from '../../hooks/useAxios'
 
 function CVBuilderPage() {
   const cv = useSelector(state => state?.cv)
   const dispatch = useDispatch()
 
   const { response, error } = useAxios({
-    url: `${serverURL}/auth/employee-data`,
+    url: `/auth/employee-data`,
     method: 'GET',
   })
 
