@@ -1,9 +1,0 @@
-
-.form-con {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    align-items: center;
-    max-width: 480px;
-    margin: 0 16px;
-}

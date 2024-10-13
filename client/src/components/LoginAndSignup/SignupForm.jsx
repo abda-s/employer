@@ -1,14 +1,15 @@
 import React, { useState } from 'react'
-import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { TextField, Button, FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton } from '@mui/material';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { Button, Box } from '@mui/material';
+import { Formik, Form, } from 'formik';
 import * as Yup from 'yup';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAxios } from '../../hooks/useAxios';
+import TextInputField from '../common/TextInputField';
+import PasswordInputField from '../common/PasswordInputField';
 
 const SignupValidationSchema = Yup.object({
-    email: Yup.string().email('Invalid email address').required('Required'),
-    password: Yup.string().required('Password Required'),
+    email: Yup.string().email('Invalid email address').required('Email is Required'),
+    password: Yup.string().required('Password is Required'),
     confirmPassword: Yup.string()
         .oneOf([Yup.ref('password'), null], 'Passwords must match')
         .required('Password confirmation is required'),
@@ -17,8 +18,6 @@ const SignupValidationSchema = Yup.object({
 
 
 function SignupForm() {
-    const [showPassword, setShowPassword] = useState(false);
-    const handleClickShowPassword = () => setShowPassword((show) => !show);
     const [error, setError] = useState('');
     const navigate = useNavigate()
 
@@ -41,7 +40,13 @@ function SignupForm() {
 
     return (
 
-        <div style={{maxWidth:"480px" , margin: "0 16px"}} >
+        <Box
+            sx={{
+                flex: 1,
+                display: 'flex',
+                width: { xs: "90%", sm: "90%", lg: "480px", xl: "480px" },
+            }}
+        >
             <Formik
                 initialValues={{ email: '', password: '', confirmPassword: '' }}
                 validationSchema={SignupValidationSchema}
@@ -49,89 +54,65 @@ function SignupForm() {
                     signupReq(values)
                 }}
             >
-                {({ values, handleChange, handleBlur, handleSubmit }) => (
+                {({ values, handleChange, handleBlur, handleSubmit, errors, touched }) => (
                     <Form onSubmit={handleSubmit}
                         style={{ width: "100%" }}
                     >
+                        <Box sx={{ display: 'flex', flexDirection: "column", gap: 2, width: '100%' }}>
 
-                        <FormControl
-                            sx={{ width: "100%", marginBottom: "24px", marginTop: "20px" }}
-                            variant="outlined"
-                            size="Normal"
-                        >
-                            <Field
-                                as={TextField}
+                            <TextInputField
                                 name="email"
                                 label="Email address"
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                value={values.email}
-                                sx={{ marginBottom: "5px" }}
+                                values={values}
+                                handleChange={handleChange}
+                                handleBlur={handleBlur}
+                                errors={errors}
+                                touched={touched}
                             />
-                            <ErrorMessage name="email" component="div" style={{ color: 'red' }} />
-                        </FormControl>
 
-                        <FormControl sx={{ width: "100%", marginBottom: "24px" }} size="Normal" variant="outlined">
-                            <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
-                            <Field
-                                as={OutlinedInput}
-                                id="outlined-adornment-password"
-                                name="password"
-                                sx={{ marginBottom: "5px" }}
-                                type={showPassword ? 'text' : 'password'}
-                                value={values.password}
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                endAdornment={
-                                    <InputAdornment position="end">
-                                        <IconButton
-                                            aria-label="toggle password visibility"
-                                            onClick={handleClickShowPassword}
-                                            edge="end"
-                                        >
-                                            {showPassword ? <VisibilityOff /> : <Visibility />}
-                                        </IconButton>
-                                    </InputAdornment>
-                                }
-                                label="Password"
+                            <PasswordInputField
+                                values={values}
+                                handleChange={handleChange}
+                                handleBlur={handleBlur}
+                                errors={errors}
+                                touched={touched}
                             />
-                            <ErrorMessage name="password" component="div" style={{ color: 'red' }} />
-                        </FormControl>
 
-                        <FormControl sx={{ width: "100%", marginBottom: "24px" }} variant="outlined">
-                            <InputLabel htmlFor="outlined-adornment-confirm-password">Confirm Password</InputLabel>
-                            <Field
-                                as={OutlinedInput}
-                                id="outlined-adornment-confirm-password"
+                            <TextInputField
                                 name="confirmPassword"
-                                sx={{ marginBottom: "5px" }}
-                                type='password'
-                                value={values.confirmPassword}
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-
                                 label="Confirm Password"
+                                values={values}
+                                handleChange={handleChange}
+                                handleBlur={handleBlur}
+                                errors={errors}
+                                touched={touched}
+                                type='password'
                             />
-                            <ErrorMessage name="confirmPassword" component="div" style={{ color: 'red' }} />
-                        </FormControl>
 
-                        {error !== "" && <div style={{ color: 'red', marginBottom: '16px' }}>{error}</div>}
+                            {error && (
+                                <Box sx={{ color: 'error.main' }}>{error}</Box>
+                            )}
 
-                        {/* <div style={{ marginBottom: "10px" }} >{passResetInfo} </div> */}
-                        <Button
-                            size='large'
-                            variant="contained"
-                            color="primary"
-                            type="submit"
-                            sx={{ marginBottom: "10px", flex: 1, width: "100%" }}
-                            disabled={isLoading}
-                        >
-                            {isLoading ? "Loading..." : "Sign up"}
-                        </Button>
+                            <Button
+                                size='large'
+                                variant="contained"
+                                color="primary"
+                                type="submit"
+                                fullWidth
+                                disabled={isLoading}
+                            >
+                                {isLoading ? "Loading..." : "Sign up"}
+                            </Button>
+
+                            <Box sx={{ flex: 1, display: 'flex', alignContent: 'flex-start', width: '100%' }}>
+                                <span>Already have an account? <Link to="/login" style={{ textDecoration: 'none', color: '#F25C05' }}>Login</Link></span>
+                            </Box>
+
+                        </Box>
                     </Form>
                 )}
             </Formik>
-        </div>
+        </Box>
     )
 }
 

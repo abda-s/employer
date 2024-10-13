@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Box, TextField, FormControl, Button, Autocomplete, InputLabel, MenuItem, Select } from '@mui/material';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { Modal, Box, Button } from '@mui/material';
+import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import dayjs from 'dayjs';
 import SkillsMultiSelectField from '../SkillsMultiSelectField';
 import { useAxios } from '../../hooks/useAxios';
+import TextInputField from '../common/TextInputField';
+import DatePickerField from '../common/DatePickerField';
+import SelectInputField from '../common/SelectInputField';
 
 const validationSchema = Yup.object({
     jobTitle: Yup.string().required('Job Title is required'),
@@ -30,10 +30,8 @@ function JobEditModal({ jobData, isVisible, onClose, setToRefreshApplications })
         setInitalSkills(skillList)
     }, []);
 
-    const { fetchData : editJob } = useAxios({method: "PUT",manual: true})
+    const { fetchData: editJob } = useAxios({ method: "PUT", manual: true })
     const handleSubmitSkills = async (values) => {
-        console.log("values", values);
-
         try {
             const result = await editJob({
                 url: `/job-posting/edit-job`,
@@ -42,12 +40,10 @@ function JobEditModal({ jobData, isVisible, onClose, setToRefreshApplications })
                     postId: jobData._id
                 }
             })
-
             if (result && !result.error) {
                 setToRefreshApplications(result)
                 onClose()
             }
-
         }
         catch (err) {
             console.log(err)
@@ -70,9 +66,9 @@ function JobEditModal({ jobData, isVisible, onClose, setToRefreshApplications })
         <Modal
             open={isVisible}
             onClose={onClose}
-            sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+            sx={{ display: "flex", alignItems: "center", mx: 2 }}
         >
-            <Box component="section" sx={{ p: 2, backgroundColor: "white", borderRadius: 3, margin: "auto", display: "flex", flexDirection: "column", justifyContent: "center", maxWidth: "500px", margin: "0 10px" }}>
+            <Box component="section" sx={{ p: 2, backgroundColor: "white", borderRadius: 3, boxSizing: "border-box", margin: "auto", display: "flex", flexDirection: "column", justifyContent: "center", width: { xs: "100%", sm: "100%", lg: "550px", xl: "550px" } }}>
 
                 <Formik
                     initialValues={initialValues}
@@ -82,112 +78,88 @@ function JobEditModal({ jobData, isVisible, onClose, setToRefreshApplications })
                     }}
                 >
                     {({ values, handleChange, handleBlur, handleSubmit, errors, touched, setFieldValue }) => (
-                        <Form onSubmit={handleSubmit} style={{ width: "100%" }} onClick={() => console.log(values.skills)}>
-                            <div style={{ marginBottom: "20px", width: "100%" }}>
-                                <div style={{ display: "flex", alignItems: "flex-start", marginBottom: "10px", width: "100%" }}>
-                                    <Field
-                                        as={TextField}
-                                        name="jobTitle"
-                                        label="Job Title"
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        value={values.jobTitle}
-                                        sx={{ flex: 1, marginRight: "10px" }}
-                                        error={Boolean(errors.jobTitle && touched.jobTitle)}
-                                        helperText={touched.jobTitle && errors.jobTitle ? errors.jobTitle : ''}
-                                    />
-                                    <Field
-                                        as={TextField}
-                                        name="companyName"
-                                        label="Company Name"
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        value={values.companyName}
-                                        sx={{ flex: 1 }}
-                                        error={Boolean(errors.companyName && touched.companyName)}
-                                        helperText={touched.companyName && errors.companyName ? errors.companyName : ''}
-                                    />
-                                </div>
-                                <div style={{ display: "flex", alignItems: "flex-start", marginBottom: "10px", width: "100%" }}>
-                                    <Field
-                                        as={TextField}
-                                        name="location"
-                                        label="Location"
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        value={values.location}
-                                        sx={{ flex: 1, marginRight: "10px" }}
-                                        error={Boolean(errors.location && touched.location)}
-                                        helperText={touched.location && errors.location ? errors.location : ''}
-                                    />
+                        <Form onSubmit={handleSubmit} style={{ width: "100%" }}>
+                            <Box
+                                sx={{
+                                    display: "grid",
+                                    gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+                                    gap: 2,
+                                    width: "100%",
+                                    mb: 2
+                                }}
+                            >
+                                <TextInputField
+                                    name="jobTitle"
+                                    label="Job Title"
+                                    values={values}
+                                    handleChange={handleChange}
+                                    handleBlur={handleBlur}
+                                    errors={errors}
+                                    touched={touched}
+                                />
+                                <TextInputField
+                                    name="companyName"
+                                    label="Company Name"
+                                    values={values}
+                                    handleChange={handleChange}
+                                    handleBlur={handleBlur}
+                                    errors={errors}
+                                    touched={touched}
+                                />
+                                <TextInputField
+                                    name="location"
+                                    label="Location"
+                                    values={values}
+                                    handleChange={handleChange}
+                                    handleBlur={handleBlur}
+                                    errors={errors}
+                                    touched={touched}
+                                />
 
-                                    <SkillsMultiSelectField
-                                        name="skills"
-                                        label="Add Skill"
-                                        values={values}
-                                        setFieldValue={(fieldName, value) => setFieldValue(fieldName, value)}
-                                        errors={errors}
-                                        touched={touched}
-                                    />
+                                <SkillsMultiSelectField
+                                    name="skills"
+                                    label="Add Skill"
+                                    values={values}
+                                    setFieldValue={(fieldName, value) => setFieldValue(fieldName, value)}
+                                    errors={errors}
+                                    touched={touched}
+                                />
 
-                                </div>
 
-                                <div style={{ display: "flex", alignItems: "flex-start", marginBottom: "10px", width: "100%" }}>
-                                    <Field
-                                        as={TextField}
-                                        multiline
-                                        name="description"
-                                        label="Description"
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        value={values.description}
-                                        sx={{ flex: 1 }}
-                                        error={Boolean(errors.description && touched.description)}
-                                        helperText={touched.description && errors.description ? errors.description : ''}
-                                    />
-                                </div>
 
-                                <div style={{ display: "flex", alignItems: "flex-start", marginBottom: "10px", width: "100%" }}>
-                                    <FormControl sx={{ flex: 1, marginRight: "10px" }} size="Normal" variant="outlined">
-                                        <Field name="applicationDeadline">
-                                            {({ field, form }) => (
-                                                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                                    <DatePicker
-                                                        label="Application Deadline"
-                                                        value={field.value}
-                                                        onChange={(newValue) => form.setFieldValue('applicationDeadline', newValue)}
-                                                        renderInput={(params) => (
-                                                            <TextField
-                                                                {...params}
-                                                                sx={{ flex: 1 }}
-                                                            />
-                                                        )}
-                                                    />
-                                                </LocalizationProvider>
-                                            )}
-                                        </Field>
-                                        <ErrorMessage name="applicationDeadline" component="span" style={{ color: 'red' }} />
-                                    </FormControl>
+                                <DatePickerField
+                                    name="applicationDeadline"
+                                    label="Application Deadline"
+                                />
 
-                                    <FormControl sx={{ flex: 1 }}>
-                                        <InputLabel>Status</InputLabel>
-                                        <Field
-                                            as={Select}
-                                            name="status"
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            value={values.status}
-                                        >
-                                            <MenuItem value="active">Active</MenuItem>
-                                            <MenuItem value="expired">Expired</MenuItem>
-                                        </Field>
-                                        <ErrorMessage name="status" component="span" style={{ color: 'red' }} />
-                                    </FormControl>
-                                </div>
-                            </div>
-                            <Box sx={{ display: "flex", justifyContent: "flex-end", marginTop: "10px" }}>
-                                <Button type="submit" variant="contained" color="primary">Save</Button>
-                                <Button variant="outlined" onClick={onClose} sx={{ marginLeft: "10px" }}>Cancel</Button>
+                                <SelectInputField
+                                    name="status"
+                                    label="Status"
+                                    values={values}
+                                    handleChange={handleChange}
+                                    handleBlur={handleBlur}
+                                    menuItems={['active', 'expired']}
+                                />
+
+                            </Box>
+                            <TextInputField
+                                name="description"
+                                label="Description"
+                                values={values}
+                                handleChange={handleChange}
+                                handleBlur={handleBlur}
+                                errors={errors}
+                                touched={touched}
+                                multiline={true}
+                            />
+                            <Box display="flex" width="100%" alignItems="center" gap={2} justifyContent="center" mt={2}>
+                                <Button variant="outlined" onClick={onClose} fullWidth>
+                                    Cancel
+                                </Button>
+                                <Button variant="contained" type="submit" fullWidth>
+                                    Save
+                                </Button>
+
                             </Box>
                         </Form>
                     )}
