@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Button } from '@mui/material';
+import { Button, Box } from '@mui/material';
 
 const SortApplicationsMenu = ({ sortApplicationsByStatus }) => {
     const menuValues = [
@@ -15,20 +15,21 @@ const SortApplicationsMenu = ({ sortApplicationsByStatus }) => {
     }, [])
 
     return (
-        <div style={{ display: "flex", width: "100%", margin: "10px" }}>
+        <Box className="sort-applications-menu" display="flex" width="100%" margin="10px" >
 
             {menuValues.map((item, index) => (
-                <div key={index} style={{ marginLeft: "5px" }}>
+                <Box key={index} marginLeft="5px">
                     <Button
                         variant="outlined"
                         onClick={() => sortApplicationsByStatus(item)}
                     >
                         {item}
                     </Button>
-                </div>
+                </Box>
             ))}
-        </div>
+        </Box>
     );
 };
 
 export default SortApplicationsMenu;
+

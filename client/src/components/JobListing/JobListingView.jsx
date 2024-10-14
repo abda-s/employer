@@ -3,11 +3,10 @@ import { useAxios } from '../../hooks/useAxios';
 import JobApplyModal from './JobApplyModal';
 import JobListingItem from './JobListingItem'; // Import the new card component
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
-import { CircularProgress } from '@mui/material';
+import { Box, CircularProgress } from '@mui/material';
 
 function JobListingView() {
-    const [toRefeshJobListing, setToRefeshJobListing] = useState(null);
-    const [isVisible, setIsVisible] = useState(false);
+    const [toRefeshJobListing, setToRefeshJobListing] = useState(null);    const [isVisible, setIsVisible] = useState(false);
     const [index, setIndex] = useState(null);
     
     const { response: jobs, error, isLoading } = useAxios({ 
@@ -18,20 +17,21 @@ function JobListingView() {
 
 
 
+
     if (isLoading) {
         return (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', width: '100vw' }}>
+            <Box className='job-listing-con' style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', width: '100vw' }}>
                 <CircularProgress />
-            </div>
+            </Box>
         );
     }
     
     if (error) {
-        return <div>Error: {error?.message || 'Something went wrong!'}</div>
+        return <Box>Error: {error?.message || 'Something went wrong!'}</Box>
     }
 
     return (
-        <div className='job-listing-con'>
+        <Box className='job-listing-con'>
             <ResponsiveMasonry
                 columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 3 }}
             >
@@ -56,8 +56,9 @@ function JobListingView() {
                 id={jobs?.[index]?._id}
                 setToRefeshJobListing={setToRefeshJobListing}
             />
-        </div>
+        </Box>
     );
 }
 
 export default JobListingView;
+

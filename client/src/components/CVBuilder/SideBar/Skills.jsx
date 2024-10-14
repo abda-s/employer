@@ -100,42 +100,42 @@ function Skills() {
                 Skills
             </AccordionSummary>
             <AccordionDetails>
-                <div style={{ width: "100%", display: "flex", flexDirection: "column" }}>
+                <Box sx={{ width: "100%", display: "flex", flexDirection: "column" }}>
                     {data?.employeeSkills?.map((item, index) => (
                         <React.Fragment key={index}>
                             <Divider />
-                            <div
-                                style={{ width: "100%", display: "flex", flexDirection: "column", padding: "7px", cursor: "pointer" }}
+                            <Box
+                                sx={{ width: "100%", display: "flex", flexDirection: "column", padding: "7px", cursor: "pointer" }}
                                 onClick={() => {
                                     setIndexOfItem(index);
                                     setIsEditMode(true);
                                 }}
                             >
-                                <div style={{ width: "100%", display: "flex", justifyContent: "space-around" }}>
-                                    <div style={{ display: "flex", flex: 1, justifyContent: "center" }} >
+                                <Box sx={{ width: "100%", display: "flex", justifyContent: "space-around" }}>
+                                    <Box sx={{ display: "flex", flex: 1, justifyContent: "center" }} >
                                         <Typography variant="body1">{item?.skillId?.name}</Typography>
-                                    </div>
-                                    <div style={{ display: "flex", flex: 1, justifyContent: "center" }} >
+                                    </Box>
+                                    <Box sx={{ display: "flex", flex: 1, justifyContent: "center" }} >
                                         <Typography variant="body1">{item?.level}</Typography>
-                                    </div>
-                                </div>
-                            </div>
+                                    </Box>
+                                </Box>
+                            </Box>
                             <Divider />
                         </React.Fragment>
                     ))}
-                </div>
-                <div style={{ width: "100%", display: "flex", justifyContent: "center", marginTop: "15px" }}>
+                </Box>
+                <Box sx={{ width: "100%", display: "flex", justifyContent: "center", marginTop: "15px" }}>
                     <Button
                         variant="outlined"
                         onClick={() => { setIsEditMode(true); }}
                     >
                         Add Skill
                     </Button>
-                </div>
+                </Box>
             </AccordionDetails>
         </Accordion>
     ) : (
-        <div className="sidbar-item-con">
+        <Box className="sidbar-item-con">
             <Formik
                 validationSchema={validationSchema}
                 initialValues={{
@@ -156,8 +156,8 @@ function Skills() {
                 {({ values, handleChange, handleBlur, handleSubmit, errors, touched, setFieldValue }) => (
                     <Form onSubmit={handleSubmit} style={{ width: "100%" }}
                     >
-                        <div style={{ marginBottom: "20px", width: "100%" }}>
-                            <div style={{ display: "flex", alignItems: "flex-start", marginBottom: "10px", width: "100%" }}>
+                        <Box sx={{ marginBottom: "20px", width: "100%" }}>
+                            <Box sx={{ display: "flex", alignItems: "flex-start", marginBottom: "10px", width: "100%" }}>
                                 {indexOfItem !== null ? (
                                     <Box sx={{ display: "flex", flex: 1, alignItems: "center", justifyContent: "center", mt: 1 }} >
                                         <Box sx={{ fontSize: "18px" }} >
@@ -191,17 +191,17 @@ function Skills() {
                                     error={Boolean(errors.level && touched.level)}
                                     helperText={touched.level && errors.level ? errors.level : ''}
                                 />
-                            </div>
-                        </div>
-                        <div style={{ display: "flex", width: "100%", alignItems: "center", justifyContent: "center" }}>
+                            </Box>
+                        </Box>
+                        <Box sx={{ display: "flex", width: "100%", alignItems: "center", justifyContent: "center" }}>
                             {indexOfItem !== null && (
-                                <div style={{ display: "flex", flex: 1, justifyContent: "center" }}>
+                                <Box sx={{ display: "flex", flex: 1, justifyContent: "center" }}>
                                     <IconButton onClick={() => { deleteItem(indexOfItem); setIsEditMode(false); }}>
                                         <DeleteIcon sx={{ fontSize: "30px" }} />
                                     </IconButton>
-                                </div>
+                                </Box>
                             )}
-                            <div style={{ flex: 1, marginRight: "10px" }}>
+                            <Box sx={{ flex: 1, marginRight: "10px" }}>
                                 <Button
                                     variant="outlined"
                                     onClick={() => {
@@ -212,8 +212,8 @@ function Skills() {
                                 >
                                     Cancel
                                 </Button>
-                            </div>
-                            <div style={{ flex: 1 }}>
+                            </Box>
+                            <Box sx={{ flex: 1 }}>
                                 <Button
                                     variant="contained"
                                     type='submit'
@@ -221,13 +221,13 @@ function Skills() {
                                 >
                                     Save
                                 </Button>
-                            </div>
-                        </div>
+                            </Box>
+                        </Box>
                     </Form>
                 )}
             </Formik>
-        </div>
-    );
-}
+        </Box>
+    );}
+
 
 export default Skills;

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Box } from '@mui/material';
 import JobEditModal from './JobEditModal';
 import JobPostingCard from './JobPostingCard'; // Import the new card component
 
@@ -7,7 +8,7 @@ function JobPostingsView({ data, setIndexOfJob }) {
     const [indexOfItem, setIndexOfItem] = useState(null);
 
     return (
-        <div className='job-posting-view-con' >
+        <Box className='job-posting-view-con' >
             {data?.map((item, index) => (
                 <JobPostingCard
                     index={index}
@@ -28,8 +29,9 @@ function JobPostingsView({ data, setIndexOfJob }) {
 
                 />
             )}
-        </div>
+        </Box>
     );
 }
 
 export default JobPostingsView;
+

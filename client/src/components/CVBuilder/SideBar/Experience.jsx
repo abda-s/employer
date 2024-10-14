@@ -116,30 +116,30 @@ function Experience() {
             <AccordionDetails
                 sx={{ mp: 2 }}
             >
-                <div style={{ width: "100%", display: "flex", flexDirection: "column" }} >
+                <Box sx={{ width: "100%", display: "flex", flexDirection: "column" }} >
                     {data?.experience?.map((item, index) => {
                         return (
-                            <Box key={index} >
+                            <Box key={index} sx={{ width: "100%", display: "flex", flexDirection: "column" }} >
                                 <Divider />
-                                <div style={{ width: "100%", display: "flex", flexDirection: "column", padding: "7px", cursor: "pointer" }}
+                                <Box sx={{ width: "100%", display: "flex", flexDirection: "column", padding: "7px", cursor: "pointer" }}
                                     onClick={() => { setIndexOfItem(index); setIsEditMode(true); }}
                                 >
-                                    <div style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-around" }}>
+                                    <Box sx={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-around" }}>
                                         <Typography variant="body2" sx={{}} >
                                             {item.jobTitle}
                                         </Typography>
                                         <Typography variant="body1" >
                                             {item.companyName}
                                         </Typography  >
-                                    </div>
+                                    </Box>
 
-                                    <div style={{ width: "100%", display: "flex" }}>
+                                    <Box sx={{ width: "100%", display: "flex" }}>
                                         <Typography variant="body2" sx={{ color: "GrayText" }} >
                                             {item.description}
                                         </Typography>
-                                    </div>
+                                    </Box>
 
-                                    <div style={{ width: "100%", display: "flex", alignItems: "center" }}>
+                                    <Box sx={{ width: "100%", display: "flex", alignItems: "center" }}>
                                         <Typography variant="body1">
                                             {moment(item.startDate).format("YYYY/MM")}
                                         </Typography  >
@@ -149,14 +149,14 @@ function Experience() {
                                         <Typography variant="body1">
                                             {moment(item.endDate).format("YYYY/MM")}
                                         </Typography>
-                                    </div>
-                                </div>
+                                    </Box>
+                                </Box>
                                 <Divider />
                             </Box>
                         )
                     })}
-                </div>
-                <div style={{ width: "100%", display: "flex", justifyContent: "center", marginTop: "15px" }} >
+                </Box>
+                <Box sx={{ width: "100%", display: "flex", justifyContent: "center", marginTop: "15px" }} >
                     <Button
                         variant="outlined"
                         onClick={() => { setIsEditMode(true); }}
@@ -164,11 +164,11 @@ function Experience() {
                     >
                         Add experience
                     </Button>
-                </div>
+                </Box>
             </AccordionDetails>
         </Accordion>
     ) : (
-        <div className="sidbar-item-con">
+        <Box className="sidbar-item-con" sx={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
             <Formik
                 validationSchema={validationSchema}
                 initialValues={
@@ -197,10 +197,10 @@ function Experience() {
                 {({ values, handleChange, handleBlur, handleSubmit, errors, touched }) => (
                     <Form
                         onSubmit={handleSubmit}
-                        style={{ width: "100%" }}
+                        sx={{ width: "100%" }}
                     >
-                        <div style={{ marginBottom: "20px", width: "100%" }}>
-                            <div style={{ display: "flex", alignItems: "flex-start", marginBottom: "10px", width: "100%" }}>
+                        <Box sx={{ marginBottom: "20px", width: "100%" }}>
+                            <Box sx={{ display: "flex", alignItems: "flex-start", marginBottom: "10px", width: "100%" }}>
                                 <Field
                                     as={TextField}
                                     name="jobTitle"
@@ -223,8 +223,8 @@ function Experience() {
                                     error={Boolean(errors.companyName && touched.companyName)}
                                     helperText={touched.companyName && errors.companyName ? errors.companyName : ''}
                                 />
-                            </div>
-                            <div style={{ display: "flex", alignItems: "flex-start", marginBottom: "10px", width: "100%" }}>
+                            </Box>
+                            <Box sx={{ display: "flex", alignItems: "flex-start", marginBottom: "10px", width: "100%" }}>
                                 <Field
                                     as={TextField}
                                     multiline
@@ -237,11 +237,10 @@ function Experience() {
                                     error={Boolean(errors.description && touched.description)}
                                     helperText={touched.description && errors.description ? errors.description : ''}
                                 />
-                            </div>
-                            <div style={{ display: "flex", alignItems: "flex-start", marginBottom: "10px", width: "100%" }}>
+                            </Box>
+                            <Box sx={{ display: "flex", alignItems: "flex-start", marginBottom: "10px", width: "100%" }}>
 
                                 <FormControl sx={{ flex: 1, marginRight: "10px" }} size="Normal" variant="outlined">
-
                                     <Field name={`startDate`}>
                                         {({ field, form }) => (
                                             <LocalizationProvider dateAdapter={AdapterDayjs} >
@@ -285,17 +284,17 @@ function Experience() {
                                     <ErrorMessage name={`endDate`} component="div" style={{ color: 'red', }} />
                                 </FormControl>
 
-                            </div>
+                            </Box>
 
-                        </div>
-                        <div style={{ display: "flex", width: "100%", alignItems: "center", justifyContent: "center" }} >
+                        </Box>
+                        <Box sx={{ display: "flex", width: "100%", alignItems: "center", justifyContent: "center" }} >
 
                             {(indexOfItem !== 0 && indexOfItem !== null) && (
-                                <div style={{ display: "flex", flex: 1, justifyContent: "center" }}>
+                                <Box sx={{ display: "flex", flex: 1, justifyContent: "center" }}>
                                     <IconButton onClick={() => { deleteItem(indexOfItem); setIndexOfItem(null); }}><DeleteIcon sx={{ fontSize: "30px" }} /></IconButton>
-                                </div>
+                                </Box>
                             )}
-                            <div style={{ flex: 1, marginRight: "10px" }} >
+                            <Box sx={{ flex: 1, marginRight: "10px" }} >
                                 <Button
                                     variant="outlined"
                                     onClick={() => {
@@ -306,9 +305,9 @@ function Experience() {
                                 >
                                     Cancel
                                 </Button>
-                            </div>
+                            </Box>
 
-                            <div style={{ flex: 1 }} >
+                            <Box sx={{ flex: 1 }} >
                                 <Button
                                     variant="contained"
                                     type='submit'
@@ -316,12 +315,12 @@ function Experience() {
                                 >
                                     Save
                                 </Button>
-                            </div>
-                        </div>
+                            </Box>
+                        </Box>
                     </Form>
                 )}
             </Formik>
-        </div>
+        </Box>
 
     )
 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Select, MenuItem, InputLabel, FormControl, Button, IconButton, useMediaQuery } from '@mui/material';
+import { Select, MenuItem, InputLabel, FormControl, Button, IconButton, useMediaQuery,Box } from '@mui/material';
 import { useReactToPrint } from 'react-to-print';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
@@ -37,32 +37,32 @@ function ApplicationDetails({ item, status, cv, setToRefreshApplications }) {
     });
 
     return !isCV ? (
-        <div style={{ display: "flex", borderRadius: "10px", boxShadow: "2px 2px 2px 1px rgb(0 0 0 / 20%)", flexDirection: "column", background: "white", width: "500px", padding: "20px", alignSelf: "center", margin: "0 10px" }}>
+        <Box className="application-details-container" sx={{ display: "flex", borderRadius: "10px", boxShadow: "2px 2px 2px 1px rgb(0 0 0 / 20%)", flexDirection: "column", background: "white", width: "500px", padding: "20px", alignSelf: "center", margin: "0 10px" }}>
 
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-evenly", marginBottom: "20px" }}>
-                <div style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: "10px", width: "100%", fontSize: "20px", background: "#fff2e0", borderRadius: "10px", color: "#f25c05" }}>
+            <Box className="application-details-header" sx={{ display: "flex", alignItems: "center", justifyContent: "space-evenly", marginBottom: "20px" }}>
+                <Box className="application-details-header-title" sx={{ display: "flex", justifyContent: "center", alignItems: "center", padding: "10px", width: "100%", fontSize: "20px", background: "#fff2e0", borderRadius: "10px", color: "#f25c05" }}>
                     Application
-                </div>
-            </div>
+                </Box>
+            </Box>
 
-            <div style={{ display: "flex", flexDirection: "column" }} >
-                <div style={{ display: "flex", width: "100%", flex: 1, alignItems: "center", justifyContent: "flex-start", marginBottom: "10px" }}>
-                    <div style={{ display: "flex", textTransform: "capitalize", fontSize: "18px" }} >
+            <Box className="application-details-content" sx={{ display: "flex", flexDirection: "column" }} >
+                <Box className="application-details-name" sx={{ display: "flex", width: "100%", flex: 1, alignItems: "center", justifyContent: "flex-start", marginBottom: "10px" }}>
+                    <Box className="application-details-name-text" sx={{ display: "flex", textTransform: "capitalize", fontSize: "18px" }} >
                         Name: {item?.employeeId?.fullName}
-                    </div>
-                </div>
+                    </Box>
+                </Box>
 
 
-                <div style={{ display: "flex", textTransform: "capitalize", fontSize: "18px", flexDirection: "column", marginBottom: "15px" }} >
-                    <div>
+                <Box className="application-details-cover-letter" sx={{ display: "flex", textTransform: "capitalize", fontSize: "18px", flexDirection: "column", marginBottom: "15px" }} >
+                    <Box className="application-details-cover-letter-title">
                         Cover Letter:
-                    </div>
-                    <p style={{ fontSize: "16px", color: "GrayText" }} >
+                    </Box>
+                    <p className="application-details-cover-letter-text" style={{ fontSize: "16px", color: "GrayText" }} >
                         {item?.coverLetter}
                     </p>
-                </div>
+                </Box>
 
-                <div style={{ display: "flex", width: "100%", flex: 1, alignItems: "center", justifyContent: "space-between" }}>
+                <Box className="application-details-actions" sx={{ display: "flex", width: "100%", flex: 1, alignItems: "center", justifyContent: "space-between" }}>
                     {isMobile ? (<>
                         <Button
                             variant='outlined'
@@ -71,11 +71,11 @@ function ApplicationDetails({ item, status, cv, setToRefreshApplications }) {
                         >
                             Download CV
                         </Button>
-                        <div style={{ display: "none" }} >
+                        <Box className="application-details-cv" sx={{ display: "none" }} >
                             <CVCanvas
                                 cv={cv}
                             />
-                        </div>
+                        </Box>
                     </>
                     ) : (
                         <Button
@@ -107,14 +107,14 @@ function ApplicationDetails({ item, status, cv, setToRefreshApplications }) {
                         </Select>
                     </FormControl>
 
-                </div>
+                </Box>
 
-            </div>
-        </div>
+            </Box>
+        </Box>
     ) : (
-        <div style={{ display: "flex", width: "55%", boxSizing: "border-box", margin: "20px", flexDirection: "column" }} >
+        <Box className="application-details-cv-container" sx={{ display: "flex", width: "55%", boxSizing: "border-box", margin: "20px", flexDirection: "column" }} >
 
-            <div style={{ display: "flex", width: "100%", justifyContent: "space-between", marginBottom: "5px" }} >
+            <Box className="application-details-cv-header" sx={{ display: "flex", width: "100%", justifyContent: "space-between", marginBottom: "5px" }} >
 
                 <IconButton
                     onClick={() => {
@@ -128,14 +128,15 @@ function ApplicationDetails({ item, status, cv, setToRefreshApplications }) {
                     <CloudDownloadIcon sx={{ fontSize: "25px", color: "white" }} />
                 </IconButton>
 
-            </div>
+            </Box>
 
             <CVCanvas
                 cv={cv}
             />
-        </div>
+        </Box>
     );
 }
 
 export default ApplicationDetails;
+
 

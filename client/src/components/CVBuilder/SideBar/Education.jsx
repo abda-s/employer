@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Divider, Accordion, AccordionDetails, AccordionSummary, Button, Typography, TextField, IconButton, Box } from '@mui/material';
+import { Box, Divider, Accordion, AccordionDetails, AccordionSummary, Button, Typography, TextField, IconButton } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Formik, Form, Field } from 'formik';
@@ -88,42 +88,48 @@ function Education() {
                 Education
             </AccordionSummary>
             <AccordionDetails>
-                <div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
+                <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
                     {data?.education?.map((item, index) => (
                         <Box key={index}>
                             <Divider />
-                            <div
-                                style={{ width: '100%', display: 'flex', flexDirection: 'column', padding: '7px', cursor: 'pointer' }}
+                            <Box
+                                sx={{
+                                    width: '100%',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    padding: '7px',
+                                    cursor: 'pointer',
+                                }}
                                 onClick={() => {
                                     setIndexOfItem(index);
                                     setIsEditMode(true);
                                 }}
                             >
-                                <div style={{ width: '100%', display: 'flex' }}>
+                                <Box sx={{ width: '100%', display: 'flex' }}>
                                     <Typography variant="body1" sx={{ fontWeight: 700 }}>
                                         {item.degree}
                                     </Typography>
                                     <Typography variant="body1" sx={{ fontStyle: 'italic' }}>
                                         ,{item?.institutionName}
                                     </Typography>
-                                </div>
-                                <div style={{ width: '100%', display: 'flex' }}>
+                                </Box>
+                                <Box sx={{ width: '100%', display: 'flex' }}>
                                     <Typography variant="body2">{item?.graduationYear}</Typography>
-                                </div>
-                            </div>
+                                </Box>
+                            </Box>
                             <Divider />
                         </Box>
                     ))}
-                </div>
-                <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '15px' }}>
+                </Box>
+                <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '15px' }}>
                     <Button variant="outlined" onClick={() => setIsEditMode(true)}>
                         Add education
                     </Button>
-                </div>
+                </Box>
             </AccordionDetails>
         </Accordion>
     ) : (
-        <div className="sidbar-item-con">
+        <Box className="sidbar-item-con">
             <Formik
                 validationSchema={validationSchema}
                 initialValues={{
@@ -148,8 +154,8 @@ function Education() {
             >
                 {({ values, handleChange, errors, touched }) => (
                     <Form style={{ width: '100%' }}>
-                        <div key={indexOfItem} style={{ marginBottom: '20px', width: '100%' }}>
-                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', marginBottom: '10px' }}>
+                        <Box key={indexOfItem} sx={{ marginBottom: '20px', width: '100%' }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', marginBottom: '10px' }}>
                                 <Field
                                     as={TextField}
                                     name={`education[0].institutionName`}
@@ -172,9 +178,9 @@ function Education() {
                                     error={Boolean(errors.education?.[0]?.graduationYear && touched.education?.[0]?.graduationYear)}
                                     helperText={touched.education?.[0]?.graduationYear && errors.education?.[0]?.graduationYear}
                                 />
-                            </div>
+                            </Box>
 
-                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', marginBottom: '10px' }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', marginBottom: '10px' }}>
                                 <Field
                                     as={TextField}
                                     name={`education[0].degree`}
@@ -185,12 +191,12 @@ function Education() {
                                     error={Boolean(errors.education?.[0]?.degree && touched.education?.[0]?.degree)}
                                     helperText={touched.education?.[0]?.degree && errors.education?.[0]?.degree}
                                 />
-                            </div>
-                        </div>
+                            </Box>
+                        </Box>
 
-                        <div style={{ display: 'flex', width: '100%', alignItems: 'center', justifyContent: 'center' }}>
+                        <Box sx={{ display: 'flex', width: '100%', alignItems: 'center', justifyContent: 'center' }}>
                             {indexOfItem !== 0 && indexOfItem !== null && (
-                                <div style={{ display: 'flex', flex: 1, justifyContent: 'center' }}>
+                                <Box sx={{ display: 'flex', flex: 1, justifyContent: 'center' }}>
                                     <IconButton
                                         onClick={() => {
                                             deleteItem(indexOfItem);
@@ -199,28 +205,29 @@ function Education() {
                                     >
                                         <DeleteIcon sx={{ fontSize: '30px' }} />
                                     </IconButton>
-                                </div>
+                                </Box>
                             )}
-                            <div style={{ flex: 1, marginRight: '10px' }}>
+                            <Box sx={{ flex: 1, marginRight: '10px' }}>
                                 <Button variant="outlined" onClick={() => {
                                     setIsEditMode(false);
                                     setIndexOfItem(null);
                                 }} fullWidth>
                                     Cancel
                                 </Button>
-                            </div>
+                            </Box>
 
-                            <div style={{ flex: 1 }}>
+                            <Box sx={{ flex: 1 }}>
                                 <Button variant="contained" type="submit" fullWidth>
                                     Save
                                 </Button>
-                            </div>
-                        </div>
+                            </Box>
+                        </Box>
                     </Form>
                 )}
             </Formik>
-        </div>
+        </Box>
     );
 }
 
 export default Education;
+

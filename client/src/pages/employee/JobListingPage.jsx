@@ -1,20 +1,21 @@
 import React from 'react'
+import { Box } from '@mui/material'
 import NavBar from '../../components/NavBar'
 import JobListingView from '../../components/jobListing/JobListingView'
 import '../../styles/JobListingPage.css'
 
 function JobListingPage() {
   return (
-    <div style={{ background: "#f4f2ee" }} >
+    <Box sx={{ background: "#f4f2ee" }} >
       <NavBar title="Job Listing" />
-      <div style={{ display: "flex", height: "100vh", }}>
+      <Box sx={{ display: "flex", height: "100vh", }}>
 
-        <div className='job-listing-view' >
+        <Box className='job-listing-view' >
         <JobListingView />
 
-        </div>
-      </div>
-    </div>
+        </Box>
+      </Box>
+    </Box>
 
   )
 }

@@ -1,4 +1,5 @@
 import React from 'react'
+import { Box } from '@mui/material'
 import SavePdf from './SideBar/SavePdf'
 import PresonalInfo from './SideBar/PresonalInfo'
 import Education from './SideBar/Education'
@@ -8,16 +9,15 @@ import Skills from './SideBar/Skills'
 
 function SideBarBuilder() {
 
-
     return (
-        <div style={{ display: "flex", flexDirection: "column", flex: 1, width: "100%", }} >
+        <Box sx={{ display: "flex", flexDirection: "column", flex: 1, width: "100%", }} >
 
             <SavePdf />
             <PresonalInfo />
             <Education />
             <Skills />
             <Experience />
-        </div>
+        </Box>
     )
 }
 

@@ -2,6 +2,8 @@ import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { initCV } from '../../redux'
 
+import { Box } from '@mui/material'
+
 import '../../styles/CVBuilderPage.css'
 import NavBar from "../../components/NavBar"
 import SideBarBuilder from "../../components/cvBuilder/SideBarBuilder"
@@ -45,23 +47,22 @@ function CVBuilderPage() {
 
 
   return (
-    <div style={{ background: "#f0eeeb" }}>
+    <Box sx={{ background: "#f0eeeb" }}>
       <NavBar title="CV Builder" />
-      <div className="container-cv-builder">
+      <Box className="container-cv-builder">
 
-        <div className="container-flex-1-cv">
+        <Box className="container-flex-1-cv">
           <SideBarBuilder />
-        </div>
+        </Box>
 
-        <div className="container-flex-2-cv">
+        <Box className="container-flex-2-cv">
           <CVCanvas
             cv={cv}
           />
-        </div>
+        </Box>
 
-      </div>
-    </div>
-  )
+      </Box>
+    </Box>  )
 }
 
 export default CVBuilderPage

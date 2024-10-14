@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ApplicationMenuItem from './ApplicationMenuItem';
-import { IconButton, CircularProgress, useMediaQuery, Typography } from '@mui/material';
+import { IconButton, CircularProgress, useMediaQuery, Typography, Box } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import JobPostingDetails from '../JobPostingDetails';
 import SortApplicationsMenu from './SortApplicationsMenu';
@@ -40,25 +40,25 @@ function ApplicationView({ id, goBack, toRefesh }) {
 
 
     return (
-        <div style={{ display: "flex", flexDirection: "column", flex: 1, height: "100%", justifyContent: "flex-start", boxSizing: "border-box" }}>
+        <Box display="flex" flexDirection="column" flex={1} height="100%" justifyContent="flex-start" boxSizing="border-box">
             {isLoading ? (
-                <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
+                <Box display="flex" justifyContent="center" alignItems="center" height="100%">
                     <CircularProgress />
-                </div>
+                </Box>
             ) : error ? (
-                <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
+                <Box display="flex" justifyContent="center" alignItems="center" height="100%">
                     <Typography variant="h6" color="error">
                         {error.message}
                     </Typography>
-                </div>
+                </Box>
             ) : (
                 <>
                     {(isMobile || role === "admin") && (
-                        <div style={{ width: "100%", marginBottom: "5px" }} onClick={goBack}>
+                        <Box width="100%" marginBottom="5px" onClick={goBack}>
                             <IconButton>
                                 <ArrowBackIcon />
                             </IconButton>
-                        </div>
+                        </Box>
                     )}
 
                     <JobPostingDetails
@@ -83,10 +83,11 @@ function ApplicationView({ id, goBack, toRefesh }) {
                     ))}
                 </>
             )}
-        </div>
+        </Box>
 
     );
 }
 
 export default ApplicationView;
+
 

@@ -1,4 +1,4 @@
-import { Typography, IconButton, FormControl, TextField, Button } from '@mui/material'
+import { Typography, IconButton, FormControl, TextField, Button, Box } from '@mui/material'
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import CallOutlinedIcon from '@mui/icons-material/CallOutlined';
 import InputMask from 'react-input-mask';
@@ -43,63 +43,64 @@ function PresonalInfo() {
     }
 
     return (
-        <div className="sidbar-item-con personal-info-con" >
-            {!isEditMode ? (<>
-                <div style={{ display: "flex", width: "100%", justifyContent: "space-between" }}>
-                    <Typography variant="h5" sx={{ marginBottom: "15px", textTransform: "capitalize", color: "#222222" }}>
-                        {data.fullName}
-                    </Typography>
+        <Box className="sidbar-item-con personal-info-con">
+            {!isEditMode ? (
+                <>
+                    <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
+                        <Typography variant="h5" sx={{ marginBottom: "15px", textTransform: "capitalize", color: "#222222" }}>
+                            {data.fullName}
+                        </Typography>
 
-                    <IconButton sx={{ marginRight: "10px" }} onClick={() => { setIsEditMode(true) }}>
-                        <EditIcon color='primary' />
-                    </IconButton>
+                        <IconButton sx={{ marginRight: "10px" }} onClick={() => { setIsEditMode(true) }}>
+                            <EditIcon color='primary' />
+                        </IconButton>
 
-                </div>
+                    </Box>
 
-                <div style={{ display: "flex" }}>
-                    <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
-                        <div style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}>
-                            <MailOutlineIcon
-                                color='primary'
-                                sx={{
-                                    marginRight: "10px"
-                                }}
-                            />
-                            <Typography variant="body1" sx={{ fontSize: "20px" }}>
-                                {email}
-                            </Typography>
-                        </div>
-
-                        {data.phoneNumber && (
-                            <div style={{ display: "flex", alignItems: "center" }}>
-                                <CallOutlinedIcon
+                    <Box sx={{ display: "flex" }}>
+                        <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
+                            <Box sx={{ display: "flex", alignItems: "center", marginBottom: "10px" }}>
+                                <MailOutlineIcon
                                     color='primary'
                                     sx={{
                                         marginRight: "10px"
                                     }}
                                 />
                                 <Typography variant="body1" sx={{ fontSize: "20px" }}>
-                                    {data.phoneNumber}
+                                    {email}
                                 </Typography>
-                            </div>
+                            </Box>
 
-                        )}
+                            {data.phoneNumber && (
+                                <Box sx={{ display: "flex", alignItems: "center" }}>
+                                    <CallOutlinedIcon
+                                        color='primary'
+                                        sx={{
+                                            marginRight: "10px"
+                                        }}
+                                    />
+                                    <Typography variant="body1" sx={{ fontSize: "20px" }}>
+                                        {data.phoneNumber}
+                                    </Typography>
+                                </Box>
+
+                            )}
 
 
-                    </div>
-                    <div style={{ flex: 1, width: "50%", height: "100%" }}>
-                        <Typography variant="body1" sx={{ fontSize: "15px", color: "GrayText", paddingLeft: "8px" }}>
-                            {data?.professionalSummary?.length > 75
-                                ? data?.professionalSummary.substring(0, 75) + '...'
-                                : data?.professionalSummary}
-                        </Typography>
-                    </div>
+                        </Box>
+                        <Box sx={{ flex: 1, width: "50%", height: "100%" }}>
+                            <Typography variant="body1" sx={{ fontSize: "15px", color: "GrayText", paddingLeft: "8px" }}>
+                                {data?.professionalSummary?.length > 75
+                                    ? data?.professionalSummary.substring(0, 75) + '...'
+                                    : data?.professionalSummary}
+                            </Typography>
+                        </Box>
 
 
 
-                </div>
-            </>) : (<>
-
+                    </Box>
+                </>
+            ) : (
                 <Formik
                     initialValues={{ fullName: data.fullName, phoneNumber: data.phoneNumber, professionalSummary: data.professionalSummary }}
                     validationSchema={validationSchema}
@@ -115,9 +116,9 @@ function PresonalInfo() {
                             style={{ width: "100%" }}
                         >
 
-                            <div style={{ display: "flex", marginBottom: "15px" }}>
+                            <Box sx={{ display: "flex", marginBottom: "15px" }}>
 
-                                <div style={{ flex: 1, marginRight: "10px" }} >
+                                <Box sx={{ flex: 1, marginRight: "10px" }} >
                                     <FormControl
                                         sx={{ width: "100%" }}
                                         variant="outlined"
@@ -136,9 +137,9 @@ function PresonalInfo() {
                                         />
                                     </FormControl>
 
-                                </div>
+                                </Box>
 
-                                <div style={{ flex: 1 }} >
+                                <Box sx={{ flex: 1 }} >
                                     <FormControl
                                         sx={{ width: "100%", marginRight: "10px" }}
                                         variant="outlined"
@@ -169,9 +170,9 @@ function PresonalInfo() {
                                         </Field>
                                     </FormControl>
 
-                                </div>
+                                </Box>
 
-                            </div>
+                            </Box>
 
                             <FormControl
                                 sx={{ width: "100%", marginBottom: "24px" }}
@@ -190,8 +191,8 @@ function PresonalInfo() {
                                 />
                             </FormControl>
 
-                            <div style={{ display: "flex", width: "100%" }} >
-                                <div style={{ flex: 1, marginRight: "10px" }} >
+                            <Box sx={{ display: "flex", width: "100%" }} >
+                                <Box sx={{ flex: 1, marginRight: "10px" }} >
                                     <Button
                                         variant="outlined"
                                         onClick={() => { setIsEditMode(false) }}
@@ -199,9 +200,9 @@ function PresonalInfo() {
                                     >
                                         Cancel
                                     </Button>
-                                </div>
+                                </Box>
 
-                                <div style={{ flex: 1 }} >
+                                <Box sx={{ flex: 1 }} >
                                     <Button
                                         variant="contained"
                                         type='submit'
@@ -209,8 +210,8 @@ function PresonalInfo() {
                                     >
                                         Save
                                     </Button>
-                                </div>
-                            </div>
+                                </Box>
+                            </Box>
 
 
 
@@ -218,8 +219,8 @@ function PresonalInfo() {
                         </Form>
                     )}
                 </Formik>
-            </>)}
-        </div>
+            )}
+        </Box>
     )
 }
 
