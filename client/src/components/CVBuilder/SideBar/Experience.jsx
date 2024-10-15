@@ -13,6 +13,8 @@ import dayjs from "dayjs"
 
 import { addExperience, deleteExperience, editExperience } from '../../../redux';
 import { useAxios } from '../../../hooks/useAxios';
+import TextInputField from '../../common/TextInputField';
+import DatePickerField from '../../common/DatePickerField';
 
 
 const validationSchema = Yup.object({
@@ -35,7 +37,7 @@ function Experience() {
     const [isEditMode, setIsEditMode] = useState(false)
     const [indexOfItem, setIndexOfItem] = useState(null)
 
-    
+
     const { fetchData: editExperienceData } = useAxios({ method: 'PUT', manual: true });
     const submitEdit = async (values) => {
         const params = { ...values, experienceIndex: indexOfItem };
@@ -74,10 +76,10 @@ function Experience() {
 
 
     // useAxios hook for deleting experience
-    const { fetchData: deleteExperienceData } = useAxios({method: 'DELETE',manual: true});
+    const { fetchData: deleteExperienceData } = useAxios({ method: 'DELETE', manual: true });
     const deleteItem = async (index) => {
         try {
-            const result = await deleteExperienceData({url: `/cv/experience/${index}`});
+            const result = await deleteExperienceData({ url: `/cv/experience/${index}` });
             if (result && !result.error) {
                 setIsEditMode(false);
                 dispatch(deleteExperience(index));
@@ -93,17 +95,12 @@ function Experience() {
     return !isEditMode ? (
         <Accordion
             sx={{
-                padding: "5px",
-                marginBottom: "20px",
-                borderRadius: "10px",
-                boxShadow: "none",  // Removes the shadow
-
-                "&::before": {
-                    display: "none" // Hides the before pseudo-element
-                },
-                "&::after": {
-                    display: "none" // Hides the after pseudo-element
-                }
+                p: 1,
+                mb: 3,
+                borderRadius: 2,
+                boxShadow: 'none',
+                '&::before': { display: 'none' },
+                '&::after': { display: 'none' },
             }}
         >
             <AccordionSummary
@@ -113,62 +110,65 @@ function Experience() {
             >
                 Experience
             </AccordionSummary>
-            <AccordionDetails
-                sx={{ mp: 2 }}
-            >
-                <Box sx={{ width: "100%", display: "flex", flexDirection: "column" }} >
-                    {data?.experience?.map((item, index) => {
-                        return (
-                            <Box key={index} sx={{ width: "100%", display: "flex", flexDirection: "column" }} >
-                                <Divider />
-                                <Box sx={{ width: "100%", display: "flex", flexDirection: "column", padding: "7px", cursor: "pointer" }}
-                                    onClick={() => { setIndexOfItem(index); setIsEditMode(true); }}
-                                >
-                                    <Box sx={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-around" }}>
-                                        <Typography variant="body2" sx={{}} >
-                                            {item.jobTitle}
-                                        </Typography>
-                                        <Typography variant="body1" >
-                                            {item.companyName}
-                                        </Typography  >
-                                    </Box>
+            <AccordionDetails>
+                <Box
+                    sx={{
+                        width: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 2,
+                    }}
+                >
 
-                                    <Box sx={{ width: "100%", display: "flex" }}>
-                                        <Typography variant="body2" sx={{ color: "GrayText" }} >
-                                            {item.description}
-                                        </Typography>
-                                    </Box>
+                    <Box sx={{ width: "100%", display: "flex", flexDirection: "column" }} >
+                        {data?.experience?.map((item, index) => {
+                            return (
+                                <Box key={index} sx={{ width: "100%", display: "flex", flexDirection: "column" }} >
+                                    {index === 0 && <Divider />}
 
-                                    <Box sx={{ width: "100%", display: "flex", alignItems: "center" }}>
-                                        <Typography variant="body1">
-                                            {moment(item.startDate).format("YYYY/MM")}
-                                        </Typography  >
-                                        <Typography variant="body1" sx={{ fontWeight: 700, marginLeft: "5px", marginRight: "5px" }} >
-                                            |
-                                        </Typography  >
-                                        <Typography variant="body1">
-                                            {moment(item.endDate).format("YYYY/MM")}
-                                        </Typography>
+                                    <Box sx={{ width: "100%", display: "flex", flexDirection: "column", p: 2, cursor: "pointer" }}
+                                        onClick={() => { setIndexOfItem(index); setIsEditMode(true); }}
+                                    >
+                                        <Box sx={{ width: "100%" }}>
+                                            <Typography variant="body1" component="span" sx={{ fontWeight: 700 }} >
+                                                {item.companyName}
+                                            </Typography>
+                                            <Typography variant="body1" component="span" >
+                                                {`, ${item.jobTitle}`}
+                                            </Typography  >
+                                        </Box>
+
+                                        <Box sx={{ width: "100%", display: "flex", alignItems: "center" }}>
+                                            <Typography variant="body1">
+                                                {moment(item.startDate).format("YYYY/MM")}
+                                            </Typography  >
+                                            <Typography variant="body1" sx={{ mx: 1 }} >
+                                                |
+                                            </Typography  >
+                                            <Typography variant="body1">
+                                                {moment(item.endDate).format("YYYY/MM")}
+                                            </Typography>
+                                        </Box>
                                     </Box>
+                                    <Divider />
                                 </Box>
-                                <Divider />
-                            </Box>
-                        )
-                    })}
+                            )
+                        })}
+                    </Box>
+                    <Box sx={{ width: "100%", display: "flex", justifyContent: "center" }} >
+                        <Button
+                            variant="outlined"
+                            onClick={() => { setIsEditMode(true); }}
+                        >
+                            Add experience
+                        </Button>
+                    </Box>
                 </Box>
-                <Box sx={{ width: "100%", display: "flex", justifyContent: "center", marginTop: "15px" }} >
-                    <Button
-                        variant="outlined"
-                        onClick={() => { setIsEditMode(true); }}
 
-                    >
-                        Add experience
-                    </Button>
-                </Box>
             </AccordionDetails>
         </Accordion>
     ) : (
-        <Box className="sidbar-item-con" sx={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
+        <Box className="sidbar-item-con" >
             <Formik
                 validationSchema={validationSchema}
                 initialValues={
@@ -199,123 +199,83 @@ function Experience() {
                         onSubmit={handleSubmit}
                         sx={{ width: "100%" }}
                     >
-                        <Box sx={{ marginBottom: "20px", width: "100%" }}>
-                            <Box sx={{ display: "flex", alignItems: "flex-start", marginBottom: "10px", width: "100%" }}>
-                                <Field
-                                    as={TextField}
+                        <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 2 }}>
+
+                            <Box sx={{ display: "flex", width: "100%", gap: 2 }}>
+
+                                <TextInputField
                                     name="jobTitle"
                                     label="Job Title"
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    value={values.jobTitle}
-                                    sx={{ flex: 1, marginRight: "5px" }}
-                                    error={Boolean(errors.jobTitle && touched.jobTitle)}
-                                    helperText={touched.jobTitle && errors.jobTitle ? errors.jobTitle : ''}
+                                    values={values}
+                                    touched={touched}
+                                    errors={errors}
+                                    handleBlur={handleBlur}
+                                    handleChange={handleChange}
                                 />
-                                <Field
-                                    as={TextField}
+
+                                <TextInputField
                                     name="companyName"
                                     label="Company Name"
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    value={values.companyName}
-                                    sx={{ flex: 1 }}
-                                    error={Boolean(errors.companyName && touched.companyName)}
-                                    helperText={touched.companyName && errors.companyName ? errors.companyName : ''}
+                                    values={values}
+                                    touched={touched}
+                                    errors={errors}
+                                    handleBlur={handleBlur}
+                                    handleChange={handleChange}
                                 />
                             </Box>
-                            <Box sx={{ display: "flex", alignItems: "flex-start", marginBottom: "10px", width: "100%" }}>
-                                <Field
-                                    as={TextField}
-                                    multiline
-                                    name="description"
-                                    label="Description"
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    value={values.description}
-                                    sx={{ flex: 1 }}
-                                    error={Boolean(errors.description && touched.description)}
-                                    helperText={touched.description && errors.description ? errors.description : ''}
+                            <TextInputField
+                                name="description"
+                                label="Description"
+                                values={values}
+                                touched={touched}
+                                errors={errors}
+                                handleBlur={handleBlur}
+                                handleChange={handleChange}
+                                multiline={true}
+                            />
+
+                            <Box sx={{ display: "flex", width: "100%", gap: 2 }}>
+
+                                <DatePickerField
+                                    name="startDate"
+                                    label="Start Date"
                                 />
-                            </Box>
-                            <Box sx={{ display: "flex", alignItems: "flex-start", marginBottom: "10px", width: "100%" }}>
 
-                                <FormControl sx={{ flex: 1, marginRight: "10px" }} size="Normal" variant="outlined">
-                                    <Field name={`startDate`}>
-                                        {({ field, form }) => (
-                                            <LocalizationProvider dateAdapter={AdapterDayjs} >
-                                                <DatePicker
-                                                    label="Start Date"
-                                                    value={field.value}
-                                                    onChange={(newValue) => form.setFieldValue(field.name, newValue)}
-                                                    renderInput={(params) => (
-                                                        <TextField
-                                                            {...params}
-                                                            sx={{ flex: 1 }}
-                                                        />
-                                                    )}
-                                                />
-                                            </LocalizationProvider>
-                                        )}
-                                    </Field>
-                                    <ErrorMessage name={`startDate`} component="span" style={{ color: 'red' }} />
-
-                                </FormControl>
-
-                                <FormControl sx={{ flex: 1, marginBottom: "24px" }} size="Normal" variant="outlined">
-                                    <Field name={`endDate`}>
-                                        {({ field, form }) => (
-                                            <LocalizationProvider dateAdapter={AdapterDayjs} sx={{ flex: 1 }}>
-                                                <DatePicker
-                                                    sx={{ flex: 1 }}
-                                                    label="End Date"
-                                                    value={field.value}
-                                                    onChange={(newValue) => form.setFieldValue(field.name, newValue)}
-                                                    renderInput={(params) => (
-                                                        <TextField
-                                                            {...params}
-                                                            sx={{ flex: 1 }}
-                                                        />
-                                                    )}
-                                                />
-                                            </LocalizationProvider>
-                                        )}
-                                    </Field>
-                                    <ErrorMessage name={`endDate`} component="div" style={{ color: 'red', }} />
-                                </FormControl>
+                                <DatePickerField
+                                    name="endDate"
+                                    label="End Date"
+                                />
 
                             </Box>
 
-                        </Box>
-                        <Box sx={{ display: "flex", width: "100%", alignItems: "center", justifyContent: "center" }} >
+                            <Box sx={{ width: '100%', display: 'flex', gap: 2, alignItems: 'center', justifyContent: 'center' }}>
 
-                            {(indexOfItem !== 0 && indexOfItem !== null) && (
-                                <Box sx={{ display: "flex", flex: 1, justifyContent: "center" }}>
-                                    <IconButton onClick={() => { deleteItem(indexOfItem); setIndexOfItem(null); }}><DeleteIcon sx={{ fontSize: "30px" }} /></IconButton>
-                                </Box>
-                            )}
-                            <Box sx={{ flex: 1, marginRight: "10px" }} >
-                                <Button
-                                    variant="outlined"
-                                    onClick={() => {
-                                        setIsEditMode(false);
-                                        setIndexOfItem(null);
-                                    }}
-                                    fullWidth
-                                >
+                                {indexOfItem !== 0 && indexOfItem !== null && (
+                                    <Box sx={{ display: 'flex', flex: 1, justifyContent: 'center' }}>
+                                        <IconButton
+                                            onClick={() => {
+                                                deleteItem(indexOfItem);
+                                                setIndexOfItem(null);
+                                            }}
+                                        >
+                                            <DeleteIcon sx={{ fontSize: '28px' }} />
+                                        </IconButton>
+                                    </Box>
+                                )}
+
+                                <Button variant="outlined" fullWidth onClick={() => {
+                                    setIsEditMode(false);
+                                    setIndexOfItem(null);
+                                }} >
                                     Cancel
                                 </Button>
-                            </Box>
 
-                            <Box sx={{ flex: 1 }} >
-                                <Button
-                                    variant="contained"
-                                    type='submit'
-                                    fullWidth
-                                >
+                                <Button variant="contained" type="submit" fullWidth>
                                     Save
                                 </Button>
+
                             </Box>
+
                         </Box>
                     </Form>
                 )}
