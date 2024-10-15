@@ -8,6 +8,7 @@ import * as Yup from 'yup';
 import { useAxios } from '../../../hooks/useAxios'; // Assuming your hook is in this path
 
 import { addEduaction, deletEducation, editEducation } from '../../../redux';
+import TextInputField from '../../common/TextInputField';
 
 const validationSchema = Yup.object({
     education: Yup.array().of(
@@ -76,9 +77,9 @@ function Education() {
     return !isEditMode ? (
         <Accordion
             sx={{
-                padding: '5px',
-                marginBottom: '20px',
-                borderRadius: '10px',
+                p: 1,
+                mb: 3,
+                borderRadius: 2,
                 boxShadow: 'none',
                 '&::before': { display: 'none' },
                 '&::after': { display: 'none' },
@@ -88,43 +89,53 @@ function Education() {
                 Education
             </AccordionSummary>
             <AccordionDetails>
-                <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
-                    {data?.education?.map((item, index) => (
-                        <Box key={index}>
-                            <Divider />
-                            <Box
-                                sx={{
-                                    width: '100%',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    padding: '7px',
-                                    cursor: 'pointer',
-                                }}
-                                onClick={() => {
-                                    setIndexOfItem(index);
-                                    setIsEditMode(true);
-                                }}
-                            >
-                                <Box sx={{ width: '100%', display: 'flex' }}>
+                <Box
+                    sx={{
+                        width: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 2,
+                    }}
+                >
+                    <Box
+                        sx={{
+                            width: '100%',
+                            display: 'flex',
+                            flexDirection: 'column',
+                        }}
+                    >
+                        {data?.education?.map((educationItem, index) => (
+                            <Box key={index} sx={{ display: 'flex', flexDirection: 'column' }}>
+                                {index === 0 && <Divider />}
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        p: 2,
+                                        cursor: 'pointer',
+                                    }}
+                                    onClick={() => {
+                                        setIndexOfItem(index);
+                                        setIsEditMode(true);
+                                    }}
+                                >
                                     <Typography variant="body1" sx={{ fontWeight: 700 }}>
-                                        {item.degree}
+                                        {educationItem.degree}
                                     </Typography>
                                     <Typography variant="body1" sx={{ fontStyle: 'italic' }}>
-                                        ,{item?.institutionName}
+                                        {educationItem.institutionName}
                                     </Typography>
                                 </Box>
-                                <Box sx={{ width: '100%', display: 'flex' }}>
-                                    <Typography variant="body2">{item?.graduationYear}</Typography>
-                                </Box>
+                                <Divider />
                             </Box>
-                            <Divider />
-                        </Box>
-                    ))}
-                </Box>
-                <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '15px' }}>
-                    <Button variant="outlined" onClick={() => setIsEditMode(true)}>
-                        Add education
-                    </Button>
+                        ))}
+                    </Box>
+
+                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                        <Button variant="outlined" onClick={() => setIsEditMode(true)}>
+                            Add education
+                        </Button>
+                    </Box>
                 </Box>
             </AccordionDetails>
         </Accordion>
@@ -133,15 +144,13 @@ function Education() {
             <Formik
                 validationSchema={validationSchema}
                 initialValues={{
-                    education: data?.education?.[indexOfItem]
-                        ? [
-                            {
-                                institutionName: data.education[indexOfItem].institutionName,
-                                degree: data.education[indexOfItem].degree,
-                                graduationYear: data.education[indexOfItem].graduationYear,
-                            },
-                        ]
-                        : [{ institutionName: '', degree: '', graduationYear: '' }],
+                    education: data?.education?.[indexOfItem] ? [
+                        {
+                            institutionName: data.education[indexOfItem].institutionName,
+                            degree: data.education[indexOfItem].degree,
+                            graduationYear: data.education[indexOfItem].graduationYear,
+                        },
+                    ] : [{ institutionName: '', degree: '', graduationYear: '' }],
                 }}
                 onSubmit={(values) => {
                     const item = values.education[0];
@@ -152,76 +161,74 @@ function Education() {
                     }
                 }}
             >
-                {({ values, handleChange, errors, touched }) => (
+                {({ values, handleChange, handleBlur, errors, touched }) => (
                     <Form style={{ width: '100%' }}>
-                        <Box key={indexOfItem} sx={{ marginBottom: '20px', width: '100%' }}>
-                            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', marginBottom: '10px' }}>
-                                <Field
-                                    as={TextField}
-                                    name={`education[0].institutionName`}
+                        <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 2 }}>
+                            <Typography variant="h6">Edit education</Typography>
+                            <Box sx={{ display: 'flex', gap: 2 }}>
+
+                                <TextInputField
+                                    name="education[0].institutionName"
                                     label="Institution Name"
-                                    sx={{ flex: 1, marginRight: '10px' }}
-                                    value={values.education[0].institutionName}
-                                    onChange={handleChange}
-                                    error={Boolean(errors.education?.[0]?.institutionName && touched.education?.[0]?.institutionName)}
-                                    helperText={touched.education?.[0]?.institutionName && errors.education?.[0]?.institutionName}
+                                    values={values}
+                                    touched={touched}
+                                    errors={errors}
+                                    handleBlur={handleBlur}
+                                    handleChange={handleChange}
                                 />
-
-                                <Field
-                                    as={TextField}
-                                    name={`education[0].graduationYear`}
+                                <TextInputField
+                                    name="education[0].graduationYear"
                                     label="Graduation Year"
-                                    sx={{ flex: 1 }}
-                                    value={values.education[0].graduationYear}
-                                    onChange={handleChange}
+                                    values={values}
+                                    touched={touched}
+                                    errors={errors}
+                                    handleBlur={handleBlur}
+                                    handleChange={handleChange}
                                     type="number"
-                                    error={Boolean(errors.education?.[0]?.graduationYear && touched.education?.[0]?.graduationYear)}
-                                    helperText={touched.education?.[0]?.graduationYear && errors.education?.[0]?.graduationYear}
                                 />
+
                             </Box>
 
-                            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', marginBottom: '10px' }}>
-                                <Field
-                                    as={TextField}
-                                    name={`education[0].degree`}
-                                    label="Degree"
-                                    sx={{ flex: 3 }}
-                                    onChange={handleChange}
-                                    value={values.education[0].degree}
-                                    error={Boolean(errors.education?.[0]?.degree && touched.education?.[0]?.degree)}
-                                    helperText={touched.education?.[0]?.degree && errors.education?.[0]?.degree}
-                                />
-                            </Box>
-                        </Box>
+                            <TextInputField
+                                name="education[0].degree"
+                                label="Degree"
+                                values={values}
+                                touched={touched}
+                                errors={errors}
+                                handleBlur={handleBlur}
+                                handleChange={handleChange}
+                            />
 
-                        <Box sx={{ display: 'flex', width: '100%', alignItems: 'center', justifyContent: 'center' }}>
-                            {indexOfItem !== 0 && indexOfItem !== null && (
-                                <Box sx={{ display: 'flex', flex: 1, justifyContent: 'center' }}>
-                                    <IconButton
-                                        onClick={() => {
-                                            deleteItem(indexOfItem);
-                                            setIndexOfItem(null);
-                                        }}
-                                    >
-                                        <DeleteIcon sx={{ fontSize: '30px' }} />
-                                    </IconButton>
-                                </Box>
-                            )}
-                            <Box sx={{ flex: 1, marginRight: '10px' }}>
-                                <Button variant="outlined" onClick={() => {
+                            <Box sx={{ width: '100%', display: 'flex', gap: 2, alignItems: 'center', justifyContent: 'center' }}>
+
+                                {indexOfItem !== 0 && indexOfItem !== null && (
+                                    <Box sx={{ display: 'flex', flex: 1, justifyContent: 'center' }}>
+                                        <IconButton
+                                            onClick={() => {
+                                                deleteItem(indexOfItem);
+                                                setIndexOfItem(null);
+                                            }}
+                                        >
+                                            <DeleteIcon sx={{ fontSize: '28px' }} />
+                                        </IconButton>
+                                    </Box>
+                                )}
+
+                                <Button variant="outlined" fullWidth onClick={() => {
                                     setIsEditMode(false);
                                     setIndexOfItem(null);
-                                }} fullWidth>
+                                }} >
                                     Cancel
                                 </Button>
-                            </Box>
 
-                            <Box sx={{ flex: 1 }}>
                                 <Button variant="contained" type="submit" fullWidth>
                                     Save
                                 </Button>
+
                             </Box>
+
                         </Box>
+
                     </Form>
                 )}
             </Formik>

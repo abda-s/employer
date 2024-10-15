@@ -2,6 +2,7 @@ import React from 'react';
 import { TextField } from '@mui/material';
 import { Field } from 'formik';
 import PropTypes from 'prop-types';
+import {get} from 'lodash';
 
 function TextInputField({ 
     name, 
@@ -12,8 +13,16 @@ function TextInputField({
     errors, 
     touched, 
     multiline = false,
-    type="text"
+    type = "text"
 }) {
+    // Check if the name is nested
+    const isNested = name.includes('.') || name.includes('[');
+    
+    // Use lodash.get for nested fields, otherwise access directly
+    const fieldValue = isNested ? get(values, name) : values[name];
+    const fieldError = isNested ? get(errors, name) : errors[name];
+    const fieldTouched = isNested ? get(touched, name) : touched[name];
+
     return (
         <Field
             as={TextField}
@@ -21,9 +30,9 @@ function TextInputField({
             label={label}
             onChange={handleChange}
             onBlur={handleBlur}
-            value={values[name]} 
-            error={Boolean(errors[name] && touched[name])}
-            helperText={touched[name] && errors[name] ? errors[name] : ''}
+            value={fieldValue}
+            error={Boolean(fieldError && fieldTouched)}
+            helperText={fieldTouched && fieldError ? fieldError : ''}
             fullWidth // Optional: makes the text field full width
             multiline={multiline}
             type={type}
