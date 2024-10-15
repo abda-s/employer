@@ -164,7 +164,10 @@ function Education() {
                 {({ values, handleChange, handleBlur, errors, touched }) => (
                     <Form style={{ width: '100%' }}>
                         <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            <Typography variant="h6">Edit education</Typography>
+                            <Box sx={{ mb: 1 }}>
+                                <Typography variant="h6"  >Edit Experience</Typography>
+                                <Divider />
+                            </Box>
                             <Box sx={{ display: 'flex', gap: 2 }}>
 
                                 <TextInputField

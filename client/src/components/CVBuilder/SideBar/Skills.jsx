@@ -80,17 +80,14 @@ function Skills() {
     return !isEditMode ? (
         <Accordion
             sx={{
-                padding: "5px",
-                marginBottom: "20px",
-                borderRadius: "10px",
-                boxShadow: "none",
-                "&::before": {
-                    display: "none"
-                },
-                "&::after": {
-                    display: "none"
-                }
+                p: 1,
+                mb: 3,
+                borderRadius: 2,
+                boxShadow: 'none',
+                '&::before': { display: 'none' },
+                '&::after': { display: 'none' },
             }}
+
         >
             <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
@@ -100,23 +97,25 @@ function Skills() {
                 Skills
             </AccordionSummary>
             <AccordionDetails>
+
                 <Box sx={{ width: "100%", display: "flex", flexDirection: "column" }}>
                     {data?.employeeSkills?.map((item, index) => (
                         <React.Fragment key={index}>
-                            <Divider />
+                            {index === 0 && <Divider />}
+
                             <Box
-                                sx={{ width: "100%", display: "flex", flexDirection: "column", padding: "7px", cursor: "pointer" }}
+                                sx={{ width: "100%", display: "flex", flexDirection: "column", p: 1, cursor: "pointer" }}
                                 onClick={() => {
                                     setIndexOfItem(index);
                                     setIsEditMode(true);
                                 }}
                             >
-                                <Box sx={{ width: "100%", display: "flex", justifyContent: "space-around" }}>
-                                    <Box sx={{ display: "flex", flex: 1, justifyContent: "center" }} >
-                                        <Typography variant="body1">{item?.skillId?.name}</Typography>
+                                <Box sx={{ width: "100%", display: "flex" }}>
+                                    <Box sx={{ display: "flex", flex: 1, justifyContent: "flex-start" }} >
+                                        <Typography variant="body1" sx={{ fontWeight: "bold", textTransform: "capitalize" }} >{item?.skillId?.name}</Typography>
                                     </Box>
                                     <Box sx={{ display: "flex", flex: 1, justifyContent: "center" }} >
-                                        <Typography variant="body1">{item?.level}</Typography>
+                                        <Typography variant="body1">{`${item?.level}/10`}</Typography>
                                     </Box>
                                 </Box>
                             </Box>
@@ -124,7 +123,7 @@ function Skills() {
                         </React.Fragment>
                     ))}
                 </Box>
-                <Box sx={{ width: "100%", display: "flex", justifyContent: "center", marginTop: "15px" }}>
+                <Box sx={{ width: "100%", display: "flex", justifyContent: "center", mt: 2 }}>
                     <Button
                         variant="outlined"
                         onClick={() => { setIsEditMode(true); }}
@@ -156,14 +155,18 @@ function Skills() {
                 {({ values, handleChange, handleBlur, handleSubmit, errors, touched, setFieldValue }) => (
                     <Form onSubmit={handleSubmit} style={{ width: "100%" }}
                     >
-                        <Box sx={{ marginBottom: "20px", width: "100%" }}>
-                            <Box sx={{ display: "flex", alignItems: "flex-start", marginBottom: "10px", width: "100%" }}>
-                                {indexOfItem !== null ? (
-                                    <Box sx={{ display: "flex", flex: 1, alignItems: "center", justifyContent: "center", mt: 1 }} >
-                                        <Box sx={{ fontSize: "18px" }} >
-                                            {values.skillId.name}
+                        <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 2 }}>
 
-                                        </Box>
+                            <Box sx={{mb:1}} >
+                                <Typography variant="h6">Edit skill level</Typography>
+                                <Divider />
+                            </Box>
+                            <Box sx={{ display: "flex", alignItems: "flex-start", width: "100%", gap: 2 }}>
+
+
+                                {indexOfItem !== null ? (
+                                    <Box sx={{ display: "flex", flex: 1, alignItems: "center", justifyContent: "flex-start", mt: 1 }} >
+                                        <Typography variant="body1" sx={{ textTransform: "capitalize" }} >{values.skillId.name}</Typography>
                                     </Box>
                                 ) : (
                                     <SelectSkillsField
@@ -192,42 +195,40 @@ function Skills() {
                                     helperText={touched.level && errors.level ? errors.level : ''}
                                 />
                             </Box>
-                        </Box>
-                        <Box sx={{ display: "flex", width: "100%", alignItems: "center", justifyContent: "center" }}>
-                            {indexOfItem !== null && (
-                                <Box sx={{ display: "flex", flex: 1, justifyContent: "center" }}>
-                                    <IconButton onClick={() => { deleteItem(indexOfItem); setIsEditMode(false); }}>
-                                        <DeleteIcon sx={{ fontSize: "30px" }} />
-                                    </IconButton>
-                                </Box>
-                            )}
-                            <Box sx={{ flex: 1, marginRight: "10px" }}>
-                                <Button
-                                    variant="outlined"
-                                    onClick={() => {
-                                        setIsEditMode(false);
-                                        setIndexOfItem(null);
-                                    }}
-                                    fullWidth
-                                >
+                            <Box sx={{ width: '100%', display: 'flex', gap: 2, alignItems: 'center', justifyContent: 'center' }}>
+
+                                {indexOfItem !== 0 && indexOfItem !== null && (
+                                    <Box sx={{ display: 'flex', flex: 1, justifyContent: 'center' }}>
+                                        <IconButton
+                                            onClick={() => {
+                                                deleteItem(indexOfItem);
+                                                setIndexOfItem(null);
+                                            }}
+                                        >
+                                            <DeleteIcon sx={{ fontSize: '28px' }} />
+                                        </IconButton>
+                                    </Box>
+                                )}
+
+                                <Button variant="outlined" fullWidth onClick={() => {
+                                    setIsEditMode(false);
+                                    setIndexOfItem(null);
+                                }} >
                                     Cancel
                                 </Button>
-                            </Box>
-                            <Box sx={{ flex: 1 }}>
-                                <Button
-                                    variant="contained"
-                                    type='submit'
-                                    fullWidth
-                                >
+
+                                <Button variant="contained" type="submit" fullWidth>
                                     Save
                                 </Button>
+
                             </Box>
                         </Box>
                     </Form>
                 )}
             </Formik>
         </Box>
-    );}
+    );
+}
 
 
 export default Skills;

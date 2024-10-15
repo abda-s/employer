@@ -200,6 +200,10 @@ function Experience() {
                         sx={{ width: "100%" }}
                     >
                         <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 2 }}>
+                            <Box sx={{mb:1}}>
+                                <Typography variant="h6"  >Edit Experience</Typography>
+                                <Divider />
+                            </Box>
 
                             <Box sx={{ display: "flex", width: "100%", gap: 2 }}>
 
