@@ -1,4 +1,4 @@
-import { Typography, IconButton, FormControl, TextField, Button, Box } from '@mui/material'
+import { Typography, IconButton, FormControl, TextField, Button, Box, Divider } from '@mui/material'
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import CallOutlinedIcon from '@mui/icons-material/CallOutlined';
 import InputMask from 'react-input-mask';
@@ -10,6 +10,7 @@ import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import { editPrsonalInfo } from '../../../redux';
 import { useAxios } from '../../../hooks/useAxios';
+import TextInputField from '../../common/TextInputField';
 
 const validationSchema = Yup.object({
     fullName: Yup.string().required('Full name is required'),
@@ -26,13 +27,13 @@ function PresonalInfo() {
 
     const dispatch = useDispatch()
 
-    const { fetchData: editPersonalData } = useAxios({method: 'PUT',manual: true})
+    const { fetchData: editPersonalData } = useAxios({ method: 'PUT', manual: true })
     const submitEdit = (fullName, phoneNumber, professionalSummary) => {
         try {
-            const result = editPersonalData({ 
-                url: `/cv/edit-personal-data`,            
+            const result = editPersonalData({
+                url: `/cv/edit-personal-data`,
                 body: { fullName, phoneNumber, professionalSummary }
-             })
+            })
             if (result && !result.error) {
                 setIsEditMode(false)
                 dispatch(editPrsonalInfo(fullName, phoneNumber, professionalSummary))
@@ -45,25 +46,24 @@ function PresonalInfo() {
     return (
         <Box className="sidbar-item-con personal-info-con">
             {!isEditMode ? (
-                <>
+                <Box sx={{ display: "flex", width: "100%", flexDirection: "column", gap: 1 }} >
                     <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
-                        <Typography variant="h5" sx={{ marginBottom: "15px", textTransform: "capitalize", color: "#222222" }}>
+                        <Typography variant="h5" sx={{ textTransform: "capitalize", color: "#222222" }}>
                             {data.fullName}
                         </Typography>
 
-                        <IconButton sx={{ marginRight: "10px" }} onClick={() => { setIsEditMode(true) }}>
+                        <IconButton onClick={() => { setIsEditMode(true) }}>
                             <EditIcon color='primary' />
                         </IconButton>
-
                     </Box>
 
                     <Box sx={{ display: "flex" }}>
-                        <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
-                            <Box sx={{ display: "flex", alignItems: "center", marginBottom: "10px" }}>
+                        <Box sx={{ display: "flex", flexDirection: "column", flex: 1, gap: 1 }}>
+                            <Box sx={{ display: "flex", alignItems: "center" }}>
                                 <MailOutlineIcon
                                     color='primary'
                                     sx={{
-                                        marginRight: "10px"
+                                        mr: 1
                                     }}
                                 />
                                 <Typography variant="body1" sx={{ fontSize: "20px" }}>
@@ -76,7 +76,7 @@ function PresonalInfo() {
                                     <CallOutlinedIcon
                                         color='primary'
                                         sx={{
-                                            marginRight: "10px"
+                                            mr: 1
                                         }}
                                     />
                                     <Typography variant="body1" sx={{ fontSize: "20px" }}>
@@ -88,18 +88,16 @@ function PresonalInfo() {
 
 
                         </Box>
-                        <Box sx={{ flex: 1, width: "50%", height: "100%" }}>
-                            <Typography variant="body1" sx={{ fontSize: "15px", color: "GrayText", paddingLeft: "8px" }}>
+                        <Box sx={{ flex: 1, height: "100%" }}>
+                            <Typography variant="body1" sx={{ fontSize: "15px", color: "GrayText" }}>
                                 {data?.professionalSummary?.length > 75
                                     ? data?.professionalSummary.substring(0, 75) + '...'
                                     : data?.professionalSummary}
                             </Typography>
                         </Box>
 
-
-
                     </Box>
-                </>
+                </Box>
             ) : (
                 <Formik
                     initialValues={{ fullName: data.fullName, phoneNumber: data.phoneNumber, professionalSummary: data.professionalSummary }}
@@ -116,51 +114,40 @@ function PresonalInfo() {
                             style={{ width: "100%" }}
                         >
 
-                            <Box sx={{ display: "flex", marginBottom: "15px" }}>
+                            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }} >
+                            <Box sx={{ mb: 1 }}>
+                                <Typography variant="h6"  >Edit personal information</Typography>
+                                <Divider />
+                            </Box>
+                                <Box sx={{ display: "flex", gap: 2 }}>
 
-                                <Box sx={{ flex: 1, marginRight: "10px" }} >
-                                    <FormControl
-                                        sx={{ width: "100%" }}
-                                        variant="outlined"
-                                        size="small"
-                                    >
-                                        <Field
-                                            as={TextField}
-                                            name="fullName"
-                                            label="Full Name"
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            value={values.fullName}
-                                            sx={{ marginBottom: "5px" }}
-                                            error={Boolean(errors.fullName && touched.fullName)}
-                                            helperText={touched.fullName && errors.fullName ? errors.fullName : ''}
-                                        />
-                                    </FormControl>
+                                    <TextInputField
+                                        name="fullName"
+                                        label="Full Name"
+                                        values={values}
+                                        touched={touched}
+                                        errors={errors}
+                                        handleBlur={handleBlur}
+                                        handleChange={handleChange}
+                                    />
 
-                                </Box>
-
-                                <Box sx={{ flex: 1 }} >
-                                    <FormControl
-                                        sx={{ width: "100%", marginRight: "10px" }}
-                                        variant="outlined"
-                                    >
-                                        <Field name="phoneNumber">
+                                    <FormControl fullWidth >
+                                        <Field name="phoneNumber" >
                                             {({ field }) => (
                                                 <InputMask
                                                     {...field}
                                                     mask="0799999999"
-
                                                     onChange={handleChange}
                                                     onBlur={handleBlur}
                                                     value={values.phoneNumber}
-                                                    maskChar="" // Ensures no placeholder characters are displayed
+                                                    maskChar=""
                                                 >
                                                     {(inputProps) => (
                                                         <TextField
                                                             {...inputProps}
                                                             label="Phone (Optional)"
                                                             variant="outlined"
-                                                            sx={{ marginBottom: "5px" }}
+                                                            fullWidth
                                                             error={Boolean(errors.phoneNumber && touched.phoneNumber)}
                                                             helperText={touched.phoneNumber && errors.phoneNumber ? errors.phoneNumber : ''}
                                                         />
@@ -170,29 +157,21 @@ function PresonalInfo() {
                                         </Field>
                                     </FormControl>
 
+
                                 </Box>
 
-                            </Box>
-
-                            <FormControl
-                                sx={{ width: "100%", marginBottom: "24px" }}
-                                variant="outlined"
-                            >
-                                <Field
-                                    as={TextField}
-                                    multiline
-                                    rows={3}
+                                <TextInputField
                                     name="professionalSummary"
                                     label="Professional Summary (Optional)"
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    value={values.professionalSummary}
-                                    sx={{ marginBottom: "5px" }}
+                                    values={values}
+                                    touched={touched}
+                                    errors={errors}
+                                    handleBlur={handleBlur}
+                                    handleChange={handleChange}
+                                    multiline={true}
                                 />
-                            </FormControl>
 
-                            <Box sx={{ display: "flex", width: "100%" }} >
-                                <Box sx={{ flex: 1, marginRight: "10px" }} >
+                                <Box sx={{ display: "flex", width: "100%", gap: 2 }} >
                                     <Button
                                         variant="outlined"
                                         onClick={() => { setIsEditMode(false) }}
@@ -200,9 +179,7 @@ function PresonalInfo() {
                                     >
                                         Cancel
                                     </Button>
-                                </Box>
 
-                                <Box sx={{ flex: 1 }} >
                                     <Button
                                         variant="contained"
                                         type='submit'
@@ -211,11 +188,9 @@ function PresonalInfo() {
                                         Save
                                     </Button>
                                 </Box>
+
+
                             </Box>
-
-
-
-
                         </Form>
                     )}
                 </Formik>
