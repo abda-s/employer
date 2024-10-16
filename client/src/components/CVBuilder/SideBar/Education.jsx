@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, Divider, Accordion, AccordionDetails, AccordionSummary, Button, Typography, TextField, IconButton } from '@mui/material';
+import { Box, Divider, Accordion, AccordionDetails, AccordionSummary, Button, Typography, IconButton } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Formik, Form, Field } from 'formik';
+import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import { useAxios } from '../../../hooks/useAxios'; // Assuming your hook is in this path
 
@@ -32,10 +32,11 @@ function Education() {
 
     // Using the custom useAxios hook
     const { fetchData: editEducationData } = useAxios({ method: 'PUT', manual: true });
-    const submitEdit = async (institutionName, degree, graduationYear) => {
-        const values = { educationIndex: indexOfItem, institutionName, degree, graduationYear };
+    const submitEdit = async (values) => {
+        const { institutionName, degree, graduationYear } = values
+        const body = { educationIndex: indexOfItem, institutionName, degree, graduationYear };
         try {
-            const result = await editEducationData({ url: `/cv/edit-education`, body: values });
+            const result = await editEducationData({ url: `/cv/edit-education`, body });
             if (!result.error) {
                 setIsEditMode(false);
                 setIndexOfItem(null);
@@ -48,8 +49,8 @@ function Education() {
 
 
     const { fetchData: addEducationData } = useAxios({ method: 'PUT', manual: true });
-    const submitAdd = async (institutionName, degree, graduationYear) => {
-        const values = { institutionName, degree, graduationYear };
+    const submitAdd = async (values) => {
+        const { institutionName, degree, graduationYear } = values
         try {
             const result = await addEducationData({ url: `/cv/add-education`, body: values });
             if (result && !result.error) {
@@ -73,6 +74,13 @@ function Education() {
             console.log(err);
         }
     };
+
+    const initialValues = data?.education?.[indexOfItem] ? {
+        institutionName: data.education[indexOfItem].institutionName,
+        degree: data.education[indexOfItem].degree,
+        graduationYear: data.education[indexOfItem].graduationYear,
+    } : { institutionName: '', degree: '', graduationYear: '' }
+
 
     return !isEditMode ? (
         <Accordion
@@ -143,21 +151,12 @@ function Education() {
         <Box className="sidbar-item-con">
             <Formik
                 validationSchema={validationSchema}
-                initialValues={{
-                    education: data?.education?.[indexOfItem] ? [
-                        {
-                            institutionName: data.education[indexOfItem].institutionName,
-                            degree: data.education[indexOfItem].degree,
-                            graduationYear: data.education[indexOfItem].graduationYear,
-                        },
-                    ] : [{ institutionName: '', degree: '', graduationYear: '' }],
-                }}
+                initialValues={initialValues}
                 onSubmit={(values) => {
-                    const item = values.education[0];
                     if (indexOfItem !== null) {
-                        submitEdit(item.institutionName, item.degree, item.graduationYear);
+                        submitEdit(values);
                     } else {
-                        submitAdd(item.institutionName, item.degree, item.graduationYear);
+                        submitAdd(values);
                     }
                 }}
             >
@@ -171,7 +170,7 @@ function Education() {
                             <Box sx={{ display: 'flex', gap: 2 }}>
 
                                 <TextInputField
-                                    name="education[0].institutionName"
+                                    name="institutionName"
                                     label="Institution Name"
                                     values={values}
                                     touched={touched}
@@ -180,7 +179,7 @@ function Education() {
                                     handleChange={handleChange}
                                 />
                                 <TextInputField
-                                    name="education[0].graduationYear"
+                                    name="graduationYear"
                                     label="Graduation Year"
                                     values={values}
                                     touched={touched}
@@ -193,7 +192,7 @@ function Education() {
                             </Box>
 
                             <TextInputField
-                                name="education[0].degree"
+                                name="degree"
                                 label="Degree"
                                 values={values}
                                 touched={touched}
